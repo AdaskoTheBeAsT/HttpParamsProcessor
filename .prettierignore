@@ -1,0 +1,6 @@
+package.json
+tsconfig.json
+tsconfig.*.json
+package-lock.json
+yarn-lock.json
+.prettierrc

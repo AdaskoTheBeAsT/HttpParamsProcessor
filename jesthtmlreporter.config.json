@@ -1,0 +1,5 @@
+{
+    "pageTitle": "ParamUrlEncoder frontend test",
+    "outputPath": "./.artifacts/frontendunittest/frontend-test-report.html",
+    "includeFailureMsg": true
+}

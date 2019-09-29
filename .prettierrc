@@ -1,0 +1,43 @@
+{
+    "printWidth": 140,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "arrowParens": "always",
+    "useTabs": false,
+    "tabWidth": 4,
+    "semi": true,
+    "bracketSpacing": true,
+    "overrides": [
+        {
+            "files": "*.html",
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": "*.scss",
+            "options": {
+                "printWidth": 100,
+                "singleQuote": false
+            }
+        },
+        {
+            "files": "*.js",
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": "*.ts",
+            "excludeFiles": [ "**/src/server/models/*.ts", "**/src/app/services/api/*.ts" ],
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": [ "**/src/server/models/*.ts", "**/src/app/services/api/*.ts" ],
+            "options": {
+            }
+        }
+    ]
+}
