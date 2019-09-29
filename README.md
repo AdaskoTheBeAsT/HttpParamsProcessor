@@ -1,5 +1,5 @@
 # HttpParamsProcessor
-Stores complex input parameters in Angular HttpParams for http get web api call to .net core WebApi
+Stores complex input parameters in Angular HttpParams for invoking GET to .net core web api.
 HttpParams in angular collects parameters then in case of get call in translates it to proper url.
 That url in backend side can be automatically converted to instance of class or simple type.
 
