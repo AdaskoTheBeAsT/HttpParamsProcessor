@@ -10,12 +10,10 @@ const {
 const jestConfig = {
   preset: 'jest-preset-angular',
   testURL: 'http://localhost', // https://github.com/facebook/jest/issues/6766
-  setupFilesAfterEnv: ['<rootDir>/src/setup-jest.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest/setup.ts'],
   coverageReporters: ['lcov', 'text'],
   testMatch: [
-    '<rootDir>/src/**/*.(spec|test).+(ts|js)?(x)',
-    '<rootDir>/src/**/__tests__/**/*.+(ts|js)?(x)',
-    '<rootDir>/src/**/+(*.)+(spec|test).+(ts|js)?(x)'
+    '<rootDir>/**/*(*.)@(spec|test).[tj]s?(x)',
   ],
   // moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
   //   prefix: '<rootDir>/src/'
@@ -29,7 +27,7 @@ const jestConfig = {
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/out-tsc/',
-    '<rootDir>/src/.*(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$',
+    '<rootDir>/**/*(*.)@(spec|test).[tj]s?(x)',
     'src/(setup-jest|jest-global-mocks).ts',
   ],
   coverageDirectory: './.artifacts/tscoverage',
