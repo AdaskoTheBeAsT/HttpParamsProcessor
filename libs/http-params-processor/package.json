@@ -1,0 +1,27 @@
+{
+  "name": "@adaskothebeast/http-params-processor",
+  "version": "2.0.0",
+  "description": "Angular HttpParams Processor",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "keywords": [
+    "ng",
+    "angular",
+    "http",
+    "HttpParams"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "peerDependencies": {
+    "@angular/common": "^11.2.12",
+    "@angular/core": "^11.2.12"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
+  }
+}
