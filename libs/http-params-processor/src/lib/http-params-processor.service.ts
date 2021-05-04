@@ -25,7 +25,10 @@ export class HttpParamsProcessorService {
 
     if (Array.isArray(obj)) {
       return this.processArray(params, key, obj);
-    } else if (typeof obj === 'object') {
+    } else if (
+      typeof obj === 'object' &&
+      Object.prototype.toString.call(obj) !== '[object Date]'
+    ) {
       return this.processObject(
         params,
         key,

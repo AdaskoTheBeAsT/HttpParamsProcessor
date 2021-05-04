@@ -1,5 +1,9 @@
 # Versions
 
+## 2.0.2
+
+- fix in proper format for dates
+  
 ## 2.0.1
 
 - fix in documentation

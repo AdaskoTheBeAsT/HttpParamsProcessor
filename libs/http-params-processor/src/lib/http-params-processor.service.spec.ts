@@ -32,7 +32,7 @@ describe('HttpParamsProcessorService', () => {
     expect(result).toBe('p=text1%20text2');
   });
 
-  it('should process array', () => {
+  it('should process simple array', () => {
     const httpParams = service.process('p', [1, 2]);
     const result = httpParams.toString();
     expect(result).toBe('p%5B0%5D=1&p%5B1%5D=2');
@@ -48,6 +48,23 @@ describe('HttpParamsProcessorService', () => {
     const httpParams = service.process('p', { a: 1 });
     const result = httpParams.toString();
     expect(result).toBe('p.a=1');
+  });
+
+  it('should process date', () => {
+    const httpParams = service.process('p', {
+      a: new Date(Date.UTC(2021, 5, 4, 10, 31, 0)),
+    });
+    const result = httpParams.toString();
+    expect(result).toBe('p.a=2021-06-04T10:31:00.000Z');
+  });
+
+  it('should process undefined property', () => {
+    const httpParams = service.process('p', {
+      a: 'a',
+      b: undefined,
+    });
+    const result = httpParams.toString();
+    expect(result).toBe('p.a=a');
   });
 
   it('should process simple object with two properties', () => {
