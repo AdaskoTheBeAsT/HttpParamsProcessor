@@ -23,7 +23,10 @@ That url in backend side can be automatically converted to instance of class or 
             { providedIn: 'root' }
         )
         export class WebApiService {
-            constructor (@Inject(HttpClient) protected http: HttpClient, @Optional() @Inject(API_BASE_URL) protected baseUrl?: string) {
+            constructor (
+              @Inject(HttpClient) protected http: HttpClient,
+              @Optional() @Inject(API_BASE_URL) protected baseUrl?: string,
+              @Inject(HttpParamsProcessorService) protected processor: HttpParamsProcessorService) {
             }
 
             public get endpointServiceUrl(): string {
@@ -35,9 +38,7 @@ That url in backend side can be automatically converted to instance of class or 
             }
 
             public getByQuery(query: ComplexParams): Observable<SomeDto> {
-                const processor = new HttParamsProcessor();
-        
-                const httpParams: HttpParams = processor.process('p', query);
+                const httpParams: HttpParams = this.processor.process('p', query);
 
                 const headers = new HttpHeaders()
                     .set('Accept', 'application/json')
