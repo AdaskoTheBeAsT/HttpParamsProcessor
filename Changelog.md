@@ -1,5 +1,9 @@
 # Versions
 
+## 2.1.0
+
+- new method for taking existing HttpParams
+
 ## 2.0.2
 
 - fix in proper format for dates

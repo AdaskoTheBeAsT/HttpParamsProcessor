@@ -10,15 +10,21 @@ export class HttpParamsProcessorService {
     obj: Record<string | number | symbol, unknown> | null | unknown | unknown[]
   ): HttpParams {
     let params = new HttpParams();
-    params = this.processInternal(params, key, obj);
+    params = this.processWithParams(params, key, obj);
     return params;
   }
 
-  private processInternal(
+  processWithParams(
     params: HttpParams,
     key: string,
     obj: Record<string | number | symbol, unknown> | null | unknown | unknown[]
   ): HttpParams {
+    if (params == null) {
+      throw new Error(
+        'params is null or undefined - it should have instance of HttpParams'
+      );
+    }
+
     if (obj == null) {
       return params;
     }
@@ -74,7 +80,7 @@ export class HttpParamsProcessorService {
         continue;
       }
       const name = `${key}.${property}`;
-      retPar = this.processInternal(retPar, name, obj[property]);
+      retPar = this.processWithParams(retPar, name, obj[property]);
     }
 
     return retPar;
@@ -90,7 +96,7 @@ export class HttpParamsProcessorService {
     for (const item of arr) {
       const name = `${key}[${index}]`;
       index++;
-      retPar = this.processInternal(retPar, name, item);
+      retPar = this.processWithParams(retPar, name, item);
     }
 
     return retPar;

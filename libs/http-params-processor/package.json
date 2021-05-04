@@ -1,6 +1,6 @@
 {
   "name": "@adaskothebeast/http-params-processor",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Angular HttpParams Processor",
   "author": "Adam Pluciński <adaskothebeast@gmail.com>",
   "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
