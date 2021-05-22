@@ -1,5 +1,9 @@
 # Versions
 
+## 3.0.0
+
+- upgraded to angular 12
+
 ## 2.1.0
 
 - new method for taking existing HttpParams

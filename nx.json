@@ -1,19 +1,33 @@
 {
   "implicitDependencies": {
-    "package.json": { "dependencies": "*", "devDependencies": "*" },
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
     ".eslintrc.json": "*"
   },
-  "affected": { "defaultBase": "master" },
+  "affected": {
+    "defaultBase": "master"
+  },
   "npmScope": "adaskothebeast",
   "tasksRunnerOptions": {
     "default": {
       "runner": "@nrwl/workspace/tasks-runners/default",
-      "options": { "cacheableOperations": ["build", "lint", "test", "e2e"] }
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
+      }
     }
   },
   "projects": {
-    "sample": { "tags": [] },
-    "sample-e2e": { "tags": [], "implicitDependencies": ["sample"] },
-    "http-params-processor": { "tags": [] }
+    "sample": {
+      "tags": []
+    },
+    "sample-e2e": {
+      "tags": [],
+      "implicitDependencies": ["sample"]
+    },
+    "http-params-processor": {
+      "tags": []
+    }
   }
 }
