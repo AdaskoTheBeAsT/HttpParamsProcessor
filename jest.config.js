@@ -1,5 +1,6 @@
+const { getJestProjects } = require('@nrwl/jest');
+
 module.exports = {
-  projects: ['<rootDir>/apps/sample', '<rootDir>/libs/http-params-processor'],
   coverageReporters: ['lcov', 'text'],
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
@@ -59,5 +60,10 @@ module.exports = {
         outputFile: './.artifacts/frontendunittest/frontend-test.sonar.trx',
       },
     ],
+  ],
+  projects: [
+    ...getJestProjects(),
+    '<rootDir>/apps/sample',
+    '<rootDir>/libs/http-params-processor',
   ],
 };

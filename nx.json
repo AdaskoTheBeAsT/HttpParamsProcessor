@@ -19,15 +19,23 @@
     }
   },
   "projects": {
+    "http-params-processor": {
+      "tags": []
+    },
     "sample": {
       "tags": []
     },
     "sample-e2e": {
       "tags": [],
       "implicitDependencies": ["sample"]
-    },
-    "http-params-processor": {
-      "tags": []
     }
+  },
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
   }
 }
