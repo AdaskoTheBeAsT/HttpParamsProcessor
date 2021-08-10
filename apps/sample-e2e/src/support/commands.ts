@@ -9,14 +9,14 @@
 // ***********************************************
 
 /* eslint-disable @typescript-eslint/no-namespace, @typescript-eslint/prefer-namespace-keyword */
-/* tslint:disable no-namespace, no-internal-module*/
+/* tslint:disable no-namespace no-internal-module */
 declare module Cypress {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface Chainable<Subject> {
     login(email: string, password: string): void;
   }
 }
-/* tslint:enable no-namespace, no-internal-module*/
+/* tslint:enable no-namespace no-internal-module */
 /* eslint-enable @typescript-eslint/no-namespace, @typescript-eslint/prefer-namespace-keyword */
 //
 // -- This is a parent command --
