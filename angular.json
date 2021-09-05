@@ -67,6 +67,13 @@
             "jestConfig": "libs/http-params-processor/jest.config.js",
             "passWithNoTests": true
           }
+        },
+        "deploy": {
+          "builder": "ngx-deploy-npm:deploy",
+          "options": {
+            "access": "public",
+            "buildTarget": "production"
+          }
         }
       }
     },
