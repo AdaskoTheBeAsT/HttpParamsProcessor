@@ -1,5 +1,9 @@
 # Versions
 
+## 4.0.0
+
+- upgraded to angular 13.1.1
+
 ## 3.2.4
 
 - upgraded to angular 12.2.4
