@@ -27,13 +27,17 @@
               "libs/http-params-processor/src/**/*.html"
             ]
           },
-          "outputs": ["{options.outputFile}"]
+          "outputs": [
+            "{options.outputFile}"
+          ]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/http-params-processor"],
+          "outputs": [
+            "coverage/libs/http-params-processor"
+          ],
           "options": {
-            "jestConfig": "libs/http-params-processor/jest.config.js",
+            "jestConfig": "libs/http-params-processor/jest.config.ts",
             "passWithNoTests": true
           }
         },
@@ -60,8 +64,13 @@
             "main": "apps/sample/src/main.ts",
             "polyfills": "apps/sample/src/polyfills.ts",
             "tsConfig": "apps/sample/tsconfig.app.json",
-            "assets": ["apps/sample/src/favicon.ico", "apps/sample/src/assets"],
-            "styles": ["apps/sample/src/styles.scss"],
+            "assets": [
+              "apps/sample/src/favicon.ico",
+              "apps/sample/src/assets"
+            ],
+            "styles": [
+              "apps/sample/src/styles.scss"
+            ],
             "scripts": [],
             "vendorChunk": true,
             "extractLicenses": false,
@@ -125,18 +134,24 @@
               "apps/sample/src/**/*.html"
             ]
           },
-          "outputs": ["{options.outputFile}"]
+          "outputs": [
+            "{options.outputFile}"
+          ]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/sample"],
+          "outputs": [
+            "coverage/apps/sample"
+          ],
           "options": {
-            "jestConfig": "apps/sample/jest.config.js",
+            "jestConfig": "apps/sample/jest.config.ts",
             "passWithNoTests": true
           }
         }
       },
-      "implicitDependencies": ["http-params-processor"]
+      "implicitDependencies": [
+        "http-params-processor"
+      ]
     },
     "sample-e2e": {
       "root": "apps/sample-e2e",
@@ -159,12 +174,18 @@
         "lint": {
           "builder": "@nrwl/linter:eslint",
           "options": {
-            "lintFilePatterns": ["apps/sample-e2e/**/*.{js,ts}"]
+            "lintFilePatterns": [
+              "apps/sample-e2e/**/*.{js,ts}"
+            ]
           },
-          "outputs": ["{options.outputFile}"]
+          "outputs": [
+            "{options.outputFile}"
+          ]
         }
       },
-      "implicitDependencies": ["sample"]
+      "implicitDependencies": [
+        "sample"
+      ]
     }
   }
 }

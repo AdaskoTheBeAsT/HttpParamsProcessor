@@ -1,6 +1,6 @@
 module.exports = {
   displayName: 'http-params-processor',
-  preset: '../../jest.preset.js',
+  
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
@@ -16,5 +16,5 @@ module.exports = {
   ],
   transform: {
 '^.+\.(ts|mjs|js|html)$': 'jest-preset-angular' },
-transformIgnorePatterns: ['node_modules/(?!.*\.mjs$)'],
+transformIgnorePatterns: ['node_modules/(?!.*\.mjs$)'],"preset": "../../jest.preset.ts"
 };
