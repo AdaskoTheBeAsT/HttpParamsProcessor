@@ -1,0 +1,46 @@
+{
+  "$schema": "..\\..\\node_modules\\nx\\schemas\\project-schema.json",
+  "projectType": "library",
+  "root": "libs/http-params-processor",
+  "sourceRoot": "libs/http-params-processor/src",
+  "prefix": "adaskothebeast",
+  "architect": {
+    "build": {
+      "builder": "@nrwl/angular:package",
+      "options": {
+        "tsConfig": "libs/http-params-processor/tsconfig.lib.json",
+        "project": "libs/http-params-processor/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/http-params-processor/tsconfig.lib.prod.json"
+        }
+      }
+    },
+    "lint": {
+      "builder": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/http-params-processor/src/**/*.ts",
+          "libs/http-params-processor/src/**/*.html"
+        ]
+      },
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "builder": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/http-params-processor"],
+      "options": {
+        "jestConfig": "libs/http-params-processor/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "deploy": {
+      "builder": "ngx-deploy-npm:deploy",
+      "options": {
+        "access": "public",
+        "buildTarget": "production"
+      }
+    }
+  }
+}
