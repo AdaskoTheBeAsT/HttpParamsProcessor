@@ -1,6 +1,6 @@
 {
+  "name": "sample-e2e",
   "$schema": "..\\..\\node_modules\\nx\\schemas\\project-schema.json",
-  "root": "apps/sample-e2e",
   "sourceRoot": "apps/sample-e2e/src",
   "projectType": "application",
   "architect": {

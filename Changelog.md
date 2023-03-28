@@ -1,5 +1,10 @@
 # Versions
 
+## 6.0.0
+
+- upgraded to angular 15.0.0
+
+
 ## 5.0.0
 
 - upgraded to angular 14.0.0

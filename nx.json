@@ -1,15 +1,9 @@
 {
-  "implicitDependencies": {
-    "package.json": {
-      "dependencies": "*",
-      "devDependencies": "*"
-    },
-    ".eslintrc.json": "*"
-  },
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "npmScope": "adaskothebeast",
   "affected": {
     "defaultBase": "master"
   },
-  "npmScope": "adaskothebeast",
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",
@@ -18,6 +12,23 @@
         "parallel": 1
       }
     }
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    }
+  },
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.json"
+    ],
+    "sharedGlobals": []
   },
   "generators": {
     "@nrwl/angular": {
@@ -46,11 +57,5 @@
       "style": "scss"
     }
   },
-  "defaultProject": "sample",
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {
-    "build": {
-      "dependsOn": ["^build"]
-    }
-  }
+  "defaultProject": "sample"  
 }
