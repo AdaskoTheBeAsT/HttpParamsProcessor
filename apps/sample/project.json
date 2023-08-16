@@ -71,7 +71,7 @@
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "builder": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": [
           "apps/sample/src/**/*.ts",
@@ -81,7 +81,7 @@
       "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "builder": "@nrwl/jest:jest",
+      "builder": "@nx/jest:jest",
       "outputs": ["coverage/apps/sample"],
       "options": {
         "jestConfig": "apps/sample/jest.config.ts",

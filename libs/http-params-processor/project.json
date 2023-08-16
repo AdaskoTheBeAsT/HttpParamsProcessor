@@ -1,45 +1,49 @@
 {
   "name": "http-params-processor",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "projectType": "library",
   "sourceRoot": "libs/http-params-processor/src",
   "prefix": "adaskothebeast",
+  "tags": [],
+  "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nrwl/angular:package",
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
-        "tsConfig": "libs/http-params-processor/tsconfig.lib.json",
         "project": "libs/http-params-processor/ng-package.json"
       },
       "configurations": {
         "production": {
           "tsConfig": "libs/http-params-processor/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/http-params-processor/tsconfig.lib.json"
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/http-params-processor/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
         }
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": [
           "libs/http-params-processor/src/**/*.ts",
-          "libs/http-params-processor/src/**/*.html"
+          "libs/http-params-processor/src/**/*.html",
+          "libs/http-params-processor/package.json"
         ]
-      },
-      "outputs": ["{options.outputFile}"]
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/http-params-processor"],
-      "options": {
-        "jestConfig": "libs/http-params-processor/jest.config.ts",
-        "passWithNoTests": true
-      }
-    },
-    "deploy": {
-      "executor": "ngx-deploy-npm:deploy",
-      "options": {
-        "access": "public",
-        "buildTarget": "production"
       }
     }
   }

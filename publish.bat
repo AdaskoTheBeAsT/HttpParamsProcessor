@@ -1,1 +1,4 @@
-npm publish --access public ./dist/libs/http-params-processor/adaskothebeast-http-params-processor-6.0.0.tgz
+xcopy .\LICENSE .\dist\libs\http-params-processor\ /Y
+xcopy .\README.md .\dist\libs\http-params-processor\ /Y
+cd dist/libs/http-params-processor
+npm publish --tag=latest --access public
