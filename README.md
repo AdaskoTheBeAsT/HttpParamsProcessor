@@ -6,17 +6,34 @@ That url in backend side can be automatically converted to instance of class or 
 ## Usage sample
     ```javascript
         const complexParams: ComplexParams = {
-            id: 1,
-            arr: [
+          arr: [
+            {
+              id: '1',
+              innerArr: [
                 {
-                    text: 'first query object',
-                    innerArray: [1,2,3],
+                  id: '1.1',
+                  text: 'first first',
                 },
                 {
-                    text: 'second query object',
-                    innerArray: [1,2,3],
+                  id: '1.2',
+                  text: 'first second',
                 },
-            ],
+              ],
+            },
+            {
+              id: '2',
+              innerArr: [
+                {
+                  id: '2.1',
+                  text: 'second first',
+                },
+                {
+                  id: '2.2',
+                  text: 'second second',
+                },
+              ],
+            },
+          ],
         };
 
         @Injectable(
