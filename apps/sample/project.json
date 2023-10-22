@@ -71,7 +71,7 @@
       }
     },
     "lint": {
-      "builder": "@nx/linter:eslint",
+      "builder": "@nx/eslint:eslint",
       "options": {
         "lintFilePatterns": [
           "apps/sample/src/**/*.ts",
