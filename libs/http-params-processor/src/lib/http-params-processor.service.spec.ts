@@ -17,36 +17,42 @@ describe('HttpParamsProcessorService', () => {
   it('should process undefined', () => {
     const httpParams = service.process('p', undefined);
     const result = httpParams.toString();
+
     expect(result).toBe('');
   });
 
   it('should process null', () => {
     const httpParams = service.process('p', null);
     const result = httpParams.toString();
+
     expect(result).toBe('');
   });
 
   it('should process text with space', () => {
     const httpParams = service.process('p', 'text1 text2');
     const result = httpParams.toString();
+
     expect(result).toBe('p=text1%20text2');
   });
 
   it('should process simple array', () => {
     const httpParams = service.process('p', [1, 2]);
     const result = httpParams.toString();
+
     expect(result).toBe('p%5B0%5D=1&p%5B1%5D=2');
   });
 
   it('should process empty object', () => {
     const httpParams = service.process('p', {});
     const result = httpParams.toString();
+
     expect(result).toBe('');
   });
 
   it('should process simple object', () => {
     const httpParams = service.process('p', { a: 1 });
     const result = httpParams.toString();
+
     expect(result).toBe('p.a=1');
   });
 
@@ -55,6 +61,7 @@ describe('HttpParamsProcessorService', () => {
       a: new Date(Date.UTC(2021, 5, 4, 10, 31, 0)),
     });
     const result = httpParams.toString();
+
     expect(result).toBe('p.a=2021-06-04T10:31:00.000Z');
   });
 
@@ -64,18 +71,21 @@ describe('HttpParamsProcessorService', () => {
       b: undefined,
     });
     const result = httpParams.toString();
+
     expect(result).toBe('p.a=a');
   });
 
   it('should process simple object with two properties', () => {
     const httpParams = service.process('p', { a: 1, b: 'text' });
     const result = httpParams.toString();
+
     expect(result).toBe('p.a=1&p.b=text');
   });
 
   it('should process object with array', () => {
     const httpParams = service.process('p', { a: [1, 2] });
     const result = httpParams.toString();
+
     expect(result).toBe('p.a%5B0%5D=1&p.a%5B1%5D=2');
   });
 
@@ -87,6 +97,7 @@ describe('HttpParamsProcessorService', () => {
       },
     });
     const result = httpParams.toString();
+
     expect(result).toBe('p.a.b=1&p.a.c=text');
   });
 
@@ -101,6 +112,7 @@ describe('HttpParamsProcessorService', () => {
       },
     ]);
     const result = httpParams.toString();
+
     expect(result).toBe('p%5B0%5D.a=1&p%5B0%5D.b=text&p%5B1%5D.a=2');
   });
 
@@ -136,6 +148,7 @@ describe('HttpParamsProcessorService', () => {
       ],
     });
     const result = httpParams.toString();
+
     expect(result).toBe(
       'p.arr%5B0%5D.id=1&p.arr%5B0%5D.innerArr%5B0%5D.id=1.1&p.arr%5B0%5D.innerArr%5B0%5D.text=first%20first&p.arr%5B0%5D.innerArr%5B1%5D.id=1.2&p.arr%5B0%5D.innerArr%5B1%5D.text=first%20second&p.arr%5B1%5D.id=2&p.arr%5B1%5D.innerArr%5B0%5D.id=2.1&p.arr%5B1%5D.innerArr%5B0%5D.text=second%20first&p.arr%5B1%5D.innerArr%5B1%5D.id=2.2&p.arr%5B1%5D.innerArr%5B1%5D.text=second%20second'
     );
@@ -144,6 +157,7 @@ describe('HttpParamsProcessorService', () => {
   it('should process simple object with type', () => {
     const httpParams = service.process('p', { $type: 'classA', a: 1 });
     const result = httpParams.toString();
+
     expect(result).toBe('p.a=1');
   });
 });
