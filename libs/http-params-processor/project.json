@@ -30,14 +30,7 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": [
-          "libs/http-params-processor/src/**/*.ts",
-          "libs/http-params-processor/src/**/*.html",
-          "libs/http-params-processor/package.json"
-        ]
-      }
+      "outputs": ["{options.outputFile}"]
     }
   }
 }
