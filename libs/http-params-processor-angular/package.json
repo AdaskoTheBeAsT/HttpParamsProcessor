@@ -3,6 +3,7 @@
   "version": "10.0.0",
   "description": "Angular integration for http-params-processor - HttpParamsProcessorService and DI tokens",
   "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "license": "MIT",
   "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
   "keywords": [
     "ng",

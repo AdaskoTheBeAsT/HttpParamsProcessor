@@ -45,6 +45,7 @@ jobs:
     strategy:
       matrix:
         package:
+          - http-params-processor-angular
           - http-params-processor-angular-http
           - http-params-processor-angular-resource
           - http-params-processor-axios

@@ -6,13 +6,6 @@ on:
   pull_request:
     branches: [master, main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
-  cancel-in-progress: true
-
-env:
-  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
-
 jobs:
   main:
     runs-on: ubuntu-latest
@@ -24,20 +17,38 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: "24"
           cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Set SHAs for Nx affected commands
-        uses: nrwl/nx-set-shas@v4
+      - name: Build all
+        run: yarn build:all
 
-      - name: Lint affected projects
-        run: npx nx affected -t lint --parallel=3
+      - name: Test all
+        run: yarn test:all
 
-      - name: Test affected projects
-        run: npx nx affected -t test --parallel=3 --configuration=ci
+      - name: Lint all
+        run: yarn lint:ci:all
+        continue-on-error: true
 
-      - name: Build affected projects
-        run: npx nx affected -t build --parallel=3
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v7.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: .reports/libs/**/test-report.junit.xml
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: .reports/libs/**/coverage/

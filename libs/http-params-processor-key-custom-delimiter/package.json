@@ -1,8 +1,30 @@
 {
-    "name":  "@adaskothebeast/http-params-processor-key-custom-delimiter",
-    "version":  "10.0.0",
-    "peerDependencies":  {
-                             "@adaskothebeast/http-params-processor-core":  "^10.0.0"
-                         },
-    "sideEffects":  false
+  "name": "@adaskothebeast/http-params-processor-key-custom-delimiter",
+  "version": "10.0.0",
+  "description": "Custom delimiter key processor for http-params-processor - formats keys with configurable delimiters",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "keywords": [
+    "params",
+    "query",
+    "url",
+    "http",
+    "serialization",
+    "custom-delimiter",
+    "key-processor",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "peerDependencies": {
+    "@adaskothebeast/http-params-processor-core": "^10.0.0",
+    "tslib": "^2.0.0"
+  },
+  "sideEffects": false
 }

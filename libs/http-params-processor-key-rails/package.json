@@ -1,8 +1,31 @@
 {
-    "name":  "@adaskothebeast/http-params-processor-key-rails",
-    "version":  "10.0.0",
-    "peerDependencies":  {
-                             "@adaskothebeast/http-params-processor-core":  "^10.0.0"
-                         },
-    "sideEffects":  false
+  "name": "@adaskothebeast/http-params-processor-key-rails",
+  "version": "10.0.0",
+  "description": "Rails-style key processor for http-params-processor - formats keys like foo[bar][] for arrays",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "keywords": [
+    "params",
+    "query",
+    "url",
+    "http",
+    "serialization",
+    "rails",
+    "ruby",
+    "key-processor",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "peerDependencies": {
+    "@adaskothebeast/http-params-processor-core": "^10.0.0",
+    "tslib": "^2.0.0"
+  },
+  "sideEffects": false
 }

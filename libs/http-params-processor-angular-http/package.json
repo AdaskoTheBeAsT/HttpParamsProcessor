@@ -3,6 +3,7 @@
     "version":  "10.0.0",
     "description":  "Angular HttpClient/HttpParams integration for http-params-processor",
     "author":  "Adam Pluciński \u003cadaskothebeast@gmail.com\u003e",
+    "license":  "MIT",
     "homepage":  "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
     "keywords":  [
                      "ng",

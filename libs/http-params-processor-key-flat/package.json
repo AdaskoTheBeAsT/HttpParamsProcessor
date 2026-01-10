@@ -1,8 +1,30 @@
 {
-    "name":  "@adaskothebeast/http-params-processor-key-flat",
-    "version":  "10.0.0",
-    "peerDependencies":  {
-                             "@adaskothebeast/http-params-processor-core":  "^10.0.0"
-                         },
-    "sideEffects":  false
+  "name": "@adaskothebeast/http-params-processor-key-flat",
+  "version": "10.0.0",
+  "description": "Flat key processor for http-params-processor - formats keys without nesting separators",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "keywords": [
+    "params",
+    "query",
+    "url",
+    "http",
+    "serialization",
+    "flat",
+    "key-processor",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "peerDependencies": {
+    "@adaskothebeast/http-params-processor-core": "^10.0.0",
+    "tslib": "^2.0.0"
+  },
+  "sideEffects": false
 }
