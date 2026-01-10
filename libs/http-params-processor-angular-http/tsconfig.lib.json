@@ -5,13 +5,7 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": [],
-    "baseUrl": ".",
-    "paths": {
-      "@adaskothebeast/http-params-processor-angular": [
-        "../../dist/libs/http-params-processor-angular"
-      ]
-    }
+    "types": []
   },
   "exclude": [
     "src/**/*.spec.ts",
