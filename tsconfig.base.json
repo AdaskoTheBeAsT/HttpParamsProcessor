@@ -18,6 +18,9 @@
       "@adaskothebeast/http-params-processor-core": [
         "libs/http-params-processor-core/src/index.ts"
       ],
+      "@adaskothebeast/http-params-processor-angular": [
+        "libs/http-params-processor-angular/src/index.ts"
+      ],
       "@adaskothebeast/http-params-processor-axios": [
         "libs/http-params-processor-axios/src/index.ts"
       ],
@@ -26,6 +29,9 @@
       ],
       "@adaskothebeast/http-params-processor-angular-http": [
         "libs/http-params-processor-angular-http/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-angular-resource": [
+        "libs/http-params-processor-angular-resource/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-key-bracket-notation": [
         "libs/http-params-processor-key-bracket-notation/src/index.ts"
@@ -69,17 +75,11 @@
       "@adaskothebeast/http-params-processor-value-to-nodatime": [
         "libs/http-params-processor-value-to-nodatime/src/index.ts"
       ],
-      "@adaskothebeast/http-params-processor-angular-resource": [
-        "libs/http-params-processor-angular-resource/src/index.ts"
-      ],
       "@adaskothebeast/http-params-processor-react-tanstack-query": [
         "libs/http-params-processor-react-tanstack-query/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-react-swr": [
         "libs/http-params-processor-react-swr/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-angular": [
-        "libs/http-params-processor-angular/src/index.ts"
       ]
     }
   },

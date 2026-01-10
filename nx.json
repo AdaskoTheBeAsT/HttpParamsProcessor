@@ -118,6 +118,7 @@
   "release": {
     "projects": [
       "http-params-processor-core",
+      "http-params-processor-angular",
       "http-params-processor-angular-http",
       "http-params-processor-angular-resource",
       "http-params-processor-axios",
@@ -137,8 +138,7 @@
       "http-params-processor-value-to-unix-timestamp",
       "http-params-processor-value-to-ms-timestamp",
       "http-params-processor-value-to-iso",
-      "http-params-processor-value-to-nodatime",
-      "http-params-processor-angular"
+      "http-params-processor-value-to-nodatime"
     ],
     "projectsRelationship": "fixed",
     "releaseTagPattern": "v{version}",
