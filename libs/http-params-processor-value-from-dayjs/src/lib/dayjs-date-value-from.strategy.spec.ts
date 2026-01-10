@@ -1,4 +1,4 @@
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { DayjsDateValueFromStrategy } from './dayjs-date-value-from.strategy';
 
 describe('DayjsDateValueFromStrategy', () => {
@@ -34,7 +34,7 @@ describe('DayjsDateValueFromStrategy', () => {
     it('should convert dayjs to Date', () => {
       const dayjsDate = dayjs('2024-01-15T10:30:00.000Z');
       const result = strategy.normalizeValue(dayjsDate);
-      
+
       expect(result).toBeInstanceOf(Date);
       expect(result.toISOString()).toBe('2024-01-15T10:30:00.000Z');
     });
@@ -42,7 +42,7 @@ describe('DayjsDateValueFromStrategy', () => {
     it('should preserve time information', () => {
       const dayjsDate = dayjs('2024-06-15T14:00:00.000Z');
       const result = strategy.normalizeValue(dayjsDate);
-      
+
       expect(result).toBeInstanceOf(Date);
       expect(result.getTime()).toBe(dayjsDate.valueOf());
     });

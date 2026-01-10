@@ -4,6 +4,8 @@ export * from './lib/http-params-processor.service';
 // Angular-specific key formatting interface (uses HttpParams)
 export * from './lib/strategies/key-formatting-strategy.interface';
 
+export * from './lib/http-params-processor.module';
+
 // Re-export types from core
 export type {
   IKeyFormattingStrategy as IKeyFormattingStrategyCore,

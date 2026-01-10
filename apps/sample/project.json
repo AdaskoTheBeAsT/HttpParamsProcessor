@@ -89,5 +89,5 @@
       }
     }
   },
-  "implicitDependencies": ["http-params-processor-angular-http"]
+  "implicitDependencies": ["http-params-processor-angular"]
 }

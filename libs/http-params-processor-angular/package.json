@@ -1,6 +1,6 @@
 {
   "name": "@adaskothebeast/http-params-processor-angular",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "description": "Angular integration for http-params-processor - HttpParamsProcessorService and DI tokens",
   "author": "Adam Pluciński <adaskothebeast@gmail.com>",
   "license": "MIT",
@@ -21,7 +21,7 @@
   "peerDependencies": {
     "@angular/common": "^21.0.0",
     "@angular/core": "^21.0.0",
-    "@adaskothebeast/http-params-processor-core": "^10.0.0"
+    "@adaskothebeast/http-params-processor-core": "^11.0.0"
   },
   "sideEffects": false
 }

@@ -27,9 +27,6 @@
       "@adaskothebeast/http-params-processor-fetch": [
         "libs/http-params-processor-fetch/src/index.ts"
       ],
-      "@adaskothebeast/http-params-processor-angular-http": [
-        "libs/http-params-processor-angular-http/src/index.ts"
-      ],
       "@adaskothebeast/http-params-processor-angular-resource": [
         "libs/http-params-processor-angular-resource/src/index.ts"
       ],

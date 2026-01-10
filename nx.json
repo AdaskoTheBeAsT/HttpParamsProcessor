@@ -119,7 +119,6 @@
     "projects": [
       "http-params-processor-core",
       "http-params-processor-angular",
-      "http-params-processor-angular-http",
       "http-params-processor-angular-resource",
       "http-params-processor-axios",
       "http-params-processor-fetch",

@@ -150,7 +150,7 @@ describe('HttpParamsProcessorService', () => {
     const result = httpParams.toString();
 
     expect(result).toBe(
-      'p.arr%5B0%5D.id=1&p.arr%5B0%5D.innerArr%5B0%5D.id=1.1&p.arr%5B0%5D.innerArr%5B0%5D.text=first%20first&p.arr%5B0%5D.innerArr%5B1%5D.id=1.2&p.arr%5B0%5D.innerArr%5B1%5D.text=first%20second&p.arr%5B1%5D.id=2&p.arr%5B1%5D.innerArr%5B0%5D.id=2.1&p.arr%5B1%5D.innerArr%5B0%5D.text=second%20first&p.arr%5B1%5D.innerArr%5B1%5D.id=2.2&p.arr%5B1%5D.innerArr%5B1%5D.text=second%20second'
+      'p.arr%5B0%5D.id=1&p.arr%5B0%5D.innerArr%5B0%5D.id=1.1&p.arr%5B0%5D.innerArr%5B0%5D.text=first%20first&p.arr%5B0%5D.innerArr%5B1%5D.id=1.2&p.arr%5B0%5D.innerArr%5B1%5D.text=first%20second&p.arr%5B1%5D.id=2&p.arr%5B1%5D.innerArr%5B0%5D.id=2.1&p.arr%5B1%5D.innerArr%5B0%5D.text=second%20first&p.arr%5B1%5D.innerArr%5B1%5D.id=2.2&p.arr%5B1%5D.innerArr%5B1%5D.text=second%20second',
     );
   });
 
@@ -173,7 +173,7 @@ describe('HttpParamsProcessorService', () => {
     obj['self'] = obj;
 
     expect(() => service.process('p', obj)).toThrow(
-      'Circular reference detected at key: p.self'
+      'Circular reference detected at key: p.self',
     );
   });
 
@@ -183,7 +183,7 @@ describe('HttpParamsProcessorService', () => {
     child['parent'] = parent;
 
     expect(() => service.process('p', parent)).toThrow(
-      'Circular reference detected at key: p.child.parent'
+      'Circular reference detected at key: p.child.parent',
     );
   });
 
@@ -192,7 +192,7 @@ describe('HttpParamsProcessorService', () => {
     arr.push(arr);
 
     expect(() => service.process('p', arr)).toThrow(
-      'Circular reference detected at key: p[2]'
+      'Circular reference detected at key: p[2]',
     );
   });
 });

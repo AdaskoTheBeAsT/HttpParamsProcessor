@@ -1,4 +1,5 @@
-import * as moment from 'moment';
+import moment from 'moment';
+
 import { MomentDurationValueFromStrategy } from './moment-duration-value-from.strategy';
 
 describe('MomentDurationValueFromStrategy', () => {
@@ -22,7 +23,7 @@ describe('MomentDurationValueFromStrategy', () => {
     it('should convert duration with hours and minutes', () => {
       const dur = moment.duration({ hours: 1, minutes: 30 });
       const result = strategy.normalizeValue(dur);
-      
+
       expect(result.hours).toBe(1);
       expect(result.minutes).toBe(30);
     });
@@ -35,10 +36,10 @@ describe('MomentDurationValueFromStrategy', () => {
         hours: 4,
         minutes: 5,
         seconds: 6,
-        milliseconds: 7
+        milliseconds: 7,
       });
       const result = strategy.normalizeValue(dur);
-      
+
       expect(result.years).toBe(1);
       expect(result.months).toBe(2);
       expect(result.days).toBe(3);

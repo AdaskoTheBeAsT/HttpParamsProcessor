@@ -1,6 +1,6 @@
 {
   "name": "@adaskothebeast/http-params-processor-value-from-dayjs",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "description": "Day.js value processor for http-params-processor - converts Day.js objects to query parameters",
   "author": "Adam Pluciński <adaskothebeast@gmail.com>",
   "license": "MIT",
@@ -24,7 +24,7 @@
     "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
   },
   "peerDependencies": {
-    "@adaskothebeast/http-params-processor-core": "^10.0.0",
+    "@adaskothebeast/http-params-processor-core": "^11.0.0",
     "dayjs": "^1.0.0",
     "tslib": "^2.0.0"
   },

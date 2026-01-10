@@ -653,9 +653,9 @@ const cacheKey = createSWRKey('/api/products', 'filter', { status: 'active' });
 
 ## Migration Guide
 
-### Migrating from `@adaskothebeast/http-params-processor` to `@adaskothebeast/http-params-processor-angular-http`
+### Migrating from `@adaskothebeast/http-params-processor` to `@adaskothebeast/http-params-processor-angular`
 
-The original `http-params-processor` package has been split into a modular architecture. For Angular applications using `HttpClient`, migrate to `http-params-processor-angular-http`.
+The original `http-params-processor` package has been split into a modular architecture. For Angular applications using `HttpClient`, migrate to `http-params-processor-angular`.
 
 #### 1. Update Package Installation
 
@@ -664,7 +664,7 @@ The original `http-params-processor` package has been split into a modular archi
 npm uninstall @adaskothebeast/http-params-processor
 
 # Install new packages
-npm install @adaskothebeast/http-params-processor-core @adaskothebeast/http-params-processor-angular-http
+npm install @adaskothebeast/http-params-processor-core @adaskothebeast/http-params-processor-angular
 ```
 
 #### 2. Update Imports
@@ -674,7 +674,7 @@ npm install @adaskothebeast/http-params-processor-core @adaskothebeast/http-para
 import { HttpParamsProcessorService } from '@adaskothebeast/http-params-processor';
 
 // After
-import { HttpParamsProcessorService } from '@adaskothebeast/http-params-processor-angular-http';
+import { HttpParamsProcessorService } from '@adaskothebeast/http-params-processor-angular';
 ```
 
 #### 3. Update Module Imports (if using NgModule)
@@ -684,7 +684,7 @@ import { HttpParamsProcessorService } from '@adaskothebeast/http-params-processo
 import { HttpParamsProcessorModule } from '@adaskothebeast/http-params-processor';
 
 // After
-import { HttpParamsProcessorModule } from '@adaskothebeast/http-params-processor-angular-http';
+import { HttpParamsProcessorModule } from '@adaskothebeast/http-params-processor-angular';
 ```
 
 #### 4. Update Injection Tokens
@@ -700,7 +700,7 @@ import {
 import { 
   HTTP_PARAMS_KEY_FORMATTER, 
   HTTP_PARAMS_VALUE_CONVERTERS 
-} from '@adaskothebeast/http-params-processor-angular-http';
+} from '@adaskothebeast/http-params-processor-angular';
 ```
 
 #### 5. Update Key Formatter Imports (if using custom formatters)
@@ -726,7 +726,7 @@ Value converters are now split into `value-from-*` and `value-to-*` packages:
 // After - use the two-stage pipeline
 import { DayjsDateValueFromStrategy } from '@adaskothebeast/http-params-processor-value-from-dayjs';
 import { UnixTimestampValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-unix-timestamp';
-import { createValueConverter } from '@adaskothebeast/http-params-processor-angular-http';
+import { createValueConverter } from '@adaskothebeast/http-params-processor-angular';
 
 const converter = createValueConverter(
   new DayjsDateValueFromStrategy(),
@@ -744,7 +744,7 @@ The `HttpParamsProcessorService` API remains the same:
 
 | Old Import | New Package |
 |------------|-------------|
-| `@adaskothebeast/http-params-processor` | `@adaskothebeast/http-params-processor-angular-http` |
+| `@adaskothebeast/http-params-processor` | `@adaskothebeast/http-params-processor-angular` |
 | Key formatters (built-in) | `@adaskothebeast/http-params-processor-key-*` |
 | Value converters | `@adaskothebeast/http-params-processor-value-from-*` + `value-to-*` |
 | Core types/interfaces | `@adaskothebeast/http-params-processor-core` |

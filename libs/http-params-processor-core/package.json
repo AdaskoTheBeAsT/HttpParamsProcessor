@@ -1,6 +1,6 @@
 {
   "name": "@adaskothebeast/http-params-processor-core",
-  "version": "10.0.0",
+  "version": "11.0.0",
   "description": "Framework-agnostic params processor for converting complex objects to query parameters",
   "author": "Adam Pluciński <adaskothebeast@gmail.com>",
   "license": "MIT",
