@@ -1,28 +1,28 @@
 {
-    "name":  "@adaskothebeast/http-params-processor-angular-http",
-    "version":  "10.0.0",
-    "description":  "Angular HttpClient/HttpParams integration for http-params-processor",
-    "author":  "Adam Pluciński \u003cadaskothebeast@gmail.com\u003e",
-    "license":  "MIT",
-    "homepage":  "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
-    "keywords":  [
-                     "ng",
-                     "angular",
-                     "http",
-                     "HttpParams",
-                     "HttpClient"
-                 ],
-    "repository":  {
-                       "type":  "git",
-                       "url":  "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
-                   },
-    "bugs":  {
-                 "url":  "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
-             },
-    "peerDependencies":  {
-                             "@angular/common":  "^21.0.0",
-                             "@angular/core":  "^21.0.0",
-                             "@adaskothebeast/http-params-processor-angular":  "^10.0.0"
-                         },
-    "sideEffects":  false
+  "name": "@adaskothebeast/http-params-processor-angular-http",
+  "version": "10.0.0",
+  "description": "Angular HttpClient/HttpParams integration for http-params-processor",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "keywords": [
+    "ng",
+    "angular",
+    "http",
+    "HttpParams",
+    "HttpClient"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "peerDependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@adaskothebeast/http-params-processor-angular": "^10.0.0"
+  },
+  "sideEffects": false
 }

@@ -3,7 +3,7 @@ name: Publish to npm
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build:
@@ -17,8 +17,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          cache: 'yarn'
+          node-version: "24"
+
+      - name: Setup Yarn
+        run: |
+          npm install -g yarn
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -78,8 +81,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Publish ${{ matrix.package }}
         run: npm publish --provenance --access public
