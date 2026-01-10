@@ -12,6 +12,7 @@
     }
   },
   "tags": ["scope:angular", "type:lib"],
+  "implicitDependencies": ["http-params-processor-angular"],
   "targets": {
     "build": {
       "dependsOn": ["^build"],
