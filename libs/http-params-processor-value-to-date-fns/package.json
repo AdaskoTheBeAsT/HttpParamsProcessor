@@ -1,0 +1,9 @@
+{
+    "name":  "@adaskothebeast/http-params-processor-value-to-date-fns",
+    "version":  "10.0.0",
+    "peerDependencies":  {
+                             "@adaskothebeast/http-params-processor-core":  "^10.0.0",
+                             "date-fns":  "*"
+                         },
+    "sideEffects":  false
+}

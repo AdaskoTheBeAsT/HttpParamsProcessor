@@ -1,0 +1,28 @@
+{
+  "name": "@adaskothebeast/http-params-processor-angular-resource",
+  "version": "10.0.0",
+  "description": "Angular httpResource integration for http-params-processor - complex query parameters for Resource API",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "keywords": [
+    "ng",
+    "angular",
+    "httpResource",
+    "resource",
+    "http",
+    "params"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "peerDependencies": {
+    "@angular/common": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@adaskothebeast/http-params-processor-angular": "^10.0.0"
+  },
+  "sideEffects": false
+}

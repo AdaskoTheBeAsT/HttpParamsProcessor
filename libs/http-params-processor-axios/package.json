@@ -1,0 +1,45 @@
+{
+  "name": "@adaskothebeast/http-params-processor-axios",
+  "version": "10.0.0",
+  "description": "Axios adapter for params-processor - serialize complex objects to query parameters",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "keywords": [
+    "axios",
+    "params",
+    "query",
+    "url",
+    "http",
+    "serialization",
+    "typescript",
+    "paramsSerializer"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "main": "./src/index.js",
+  "module": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "require": "./src/index.js"
+    }
+  },
+  "peerDependencies": {
+    "@adaskothebeast/http-params-processor-core": "^10.0.0",
+    "axios": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "axios": {
+      "optional": true
+    }
+  },
+  "sideEffects": false
+}

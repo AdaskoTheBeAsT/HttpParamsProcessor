@@ -1,0 +1,39 @@
+{
+    "name":  "@adaskothebeast/http-params-processor-fetch",
+    "version":  "10.0.0",
+    "description":  "Fetch API adapter for params-processor - serialize complex objects to URLSearchParams",
+    "author":  "Adam Pluciński \u003cadaskothebeast@gmail.com\u003e",
+    "license":  "MIT",
+    "homepage":  "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+    "keywords":  [
+                     "fetch",
+                     "params",
+                     "query",
+                     "url",
+                     "URLSearchParams",
+                     "http",
+                     "serialization",
+                     "typescript"
+                 ],
+    "repository":  {
+                       "type":  "git",
+                       "url":  "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+                   },
+    "bugs":  {
+                 "url":  "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+             },
+    "main":  "./src/index.js",
+    "module":  "./src/index.js",
+    "types":  "./src/index.d.ts",
+    "exports":  {
+                    ".":  {
+                              "types":  "./src/index.d.ts",
+                              "import":  "./src/index.js",
+                              "require":  "./src/index.js"
+                          }
+                },
+    "peerDependencies":  {
+                             "@adaskothebeast/http-params-processor-core":  "^10.0.0"
+                         },
+    "sideEffects":  false
+}

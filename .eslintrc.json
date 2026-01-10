@@ -6,9 +6,7 @@
     {
       "files": ["*.json"],
       "parser": "jsonc-eslint-parser",
-      "rules": {
-        "@nx/dependency-checks": "error"
-      }
+      "rules": { "@nx/dependency-checks": "error" }
     },
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
@@ -19,10 +17,7 @@
             "enforceBuildableLibDependency": true,
             "allow": [],
             "depConstraints": [
-              {
-                "sourceTag": "*",
-                "onlyDependOnLibsWithTags": ["*"]
-              }
+              { "sourceTag": "*", "onlyDependOnLibsWithTags": ["*"] }
             ]
           }
         ]
@@ -31,33 +26,23 @@
     {
       "files": ["*.ts", "*.tsx"],
       "extends": ["plugin:@nx/typescript"],
-      "rules": {
-        "@typescript-eslint/no-extra-semi": "error",
-        "no-extra-semi": "off"
-      }
+      "rules": { "no-extra-semi": "off" }
     },
     {
       "files": ["*.js", "*.jsx"],
       "extends": ["plugin:@nx/javascript"],
-      "rules": {
-        "@typescript-eslint/no-extra-semi": "error",
-        "no-extra-semi": "off"
-      }
+      "rules": { "no-extra-semi": "off" }
     },
     {
       "plugins": ["jest", "jest-formatting", "jest-async", "jest-dom"],
       "files": ["*.spec.ts", "*.spec.tsx", "*.spec.js", "*.spec.jsx"],
-      "env": {
-        "jest": true
-      },
+      "env": { "jest": true },
       "extends": [
         "plugin:jest/style",
         "plugin:jest-formatting/strict",
         "plugin:jest-dom/recommended"
       ],
-      "rules": {
-        "jest-async/expect-return": "error"
-      }
+      "rules": { "jest-async/expect-return": "error" }
     }
   ]
 }

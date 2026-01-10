@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NX_CLOUD_ACCESS_TOKEN: ${{ secrets.NX_CLOUD_ACCESS_TOKEN }}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Set SHAs for Nx affected commands
+        uses: nrwl/nx-set-shas@v4
+
+      - name: Lint affected projects
+        run: npx nx affected -t lint --parallel=3
+
+      - name: Test affected projects
+        run: npx nx affected -t test --parallel=3 --configuration=ci
+
+      - name: Build affected projects
+        run: npx nx affected -t build --parallel=3

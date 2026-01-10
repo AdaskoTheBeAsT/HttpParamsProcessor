@@ -26,6 +26,11 @@
         "{workspaceRoot}/.eslintignore"
       ],
       "cache": true
+    },
+    "@nx/angular:package": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "namedInputs": {
@@ -53,9 +58,108 @@
       "unitTestRunner": "jest"
     },
     "@nx/angular:component": {
-      "style": "css"
+      "style": "css",
+      "type": "component"
+    },
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@nx/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@nx/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@nx/angular:scam": {
+      "type": "component"
+    },
+    "@nx/angular:scam-directive": {
+      "type": "directive"
+    },
+    "@nx/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@nx/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@nx/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@nx/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@nx/angular:resolver": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
     }
   },
   "parallel": 1,
-  "defaultBase": "master"
+  "defaultBase": "master",
+  "release": {
+    "projects": [
+      "http-params-processor-core",
+      "http-params-processor-angular-http",
+      "http-params-processor-angular-resource",
+      "http-params-processor-axios",
+      "http-params-processor-fetch",
+      "http-params-processor-react-tanstack-query",
+      "http-params-processor-react-swr",
+      "http-params-processor-key-bracket-notation",
+      "http-params-processor-key-flat",
+      "http-params-processor-key-json",
+      "http-params-processor-key-custom-delimiter",
+      "http-params-processor-key-rails",
+      "http-params-processor-value-from-dayjs",
+      "http-params-processor-value-from-moment",
+      "http-params-processor-value-from-luxon",
+      "http-params-processor-value-from-js-joda",
+      "http-params-processor-value-to-date-fns",
+      "http-params-processor-value-to-unix-timestamp",
+      "http-params-processor-value-to-ms-timestamp",
+      "http-params-processor-value-to-iso",
+      "http-params-processor-value-to-nodatime",
+      "http-params-processor-angular"
+    ],
+    "projectsRelationship": "fixed",
+    "releaseTagPattern": "v{version}",
+    "version": {
+      "preVersionCommand": "npx nx run-many -t build --all",
+      "conventionalCommits": true,
+      "generatorOptions": {
+        "fallbackCurrentVersionResolver": "disk"
+      }
+    },
+    "changelog": {
+      "projectChangelogs": false,
+      "workspaceChangelog": {
+        "createRelease": "github",
+        "file": "CHANGELOG.md"
+      }
+    },
+    "git": {
+      "commit": true,
+      "tag": true,
+      "commitMessage": "chore(release): publish {version}"
+    }
+  }
 }

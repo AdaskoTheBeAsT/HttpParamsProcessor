@@ -1,0 +1,8 @@
+{
+    "name":  "@adaskothebeast/http-params-processor-value-to-iso",
+    "version":  "10.0.0",
+    "peerDependencies":  {
+                             "@adaskothebeast/http-params-processor-core":  "^10.0.0"
+                         },
+    "sideEffects":  false
+}
