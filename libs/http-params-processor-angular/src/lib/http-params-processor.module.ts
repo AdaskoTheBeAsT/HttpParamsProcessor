@@ -1,6 +1,6 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpParamsProcessorService } from '@adaskothebeast/http-params-processor-angular';
+import { HttpParamsProcessorService } from './http-params-processor.service';
 
 @NgModule({
   imports: [CommonModule],
