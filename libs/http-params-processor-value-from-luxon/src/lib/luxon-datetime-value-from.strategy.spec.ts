@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+
 import { LuxonDateTimeValueFromStrategy } from './luxon-datetime-value-from.strategy';
 
 describe('LuxonDateTimeValueFromStrategy', () => {
@@ -24,9 +25,11 @@ describe('LuxonDateTimeValueFromStrategy', () => {
 
   describe('normalizeValue', () => {
     it('should convert DateTime to Date', () => {
-      const luxonDate = DateTime.fromISO('2024-01-15T10:30:00.000Z', { zone: 'utc' });
+      const luxonDate = DateTime.fromISO('2024-01-15T10:30:00.000Z', {
+        zone: 'utc',
+      });
       const result = strategy.normalizeValue(luxonDate);
-      
+
       expect(result).toBeInstanceOf(Date);
       expect(result.toISOString()).toBe('2024-01-15T10:30:00.000Z');
     });

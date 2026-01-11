@@ -1,9 +1,9 @@
-import useSWR, { SWRConfiguration, SWRResponse, Key } from 'swr';
 import {
-  ParamsProcessor,
   IKeyFormattingStrategy,
   IValueConverter,
+  ParamsProcessor,
 } from '@adaskothebeast/http-params-processor-core';
+import useSWR, { Key, SWRConfiguration, SWRResponse } from 'swr';
 
 /**
  * Options for the params processor used in SWR hooks.
@@ -73,7 +73,7 @@ export function buildUrlWithParams(
   url: string,
   paramsKey: string,
   params: Record<string, unknown>,
-  processorOptions?: SWRParamsProcessorOptions
+  processorOptions?: SWRParamsProcessorOptions,
 ): string {
   const processor = new ParamsProcessor({
     keyFormatter: processorOptions?.keyFormatter,
@@ -108,7 +108,7 @@ export function createFetcherWithParams<TData>(options: {
       url,
       options.paramsKey,
       options.params,
-      options.processorOptions
+      options.processorOptions,
     );
 
     const fetchFn = options.fetchFn ?? fetch;
@@ -148,7 +148,7 @@ export function createFetcherWithParams<TData>(options: {
  * ```
  */
 export function useSWRWithParams<TData, TError = Error>(
-  options: UseSWRWithParamsOptions<TData, TError>
+  options: UseSWRWithParamsOptions<TData, TError>,
 ): SWRResponse<TData, TError> {
   const {
     url,
@@ -193,7 +193,7 @@ export function createSWRKey(
   url: string,
   paramsKey: string,
   params: Record<string, unknown>,
-  processorOptions?: SWRParamsProcessorOptions
+  processorOptions?: SWRParamsProcessorOptions,
 ): Key {
   return buildUrlWithParams(url, paramsKey, params, processorOptions);
 }
@@ -222,7 +222,7 @@ export function getProcessedUrl(
   url: string,
   paramsKey: string,
   params: Record<string, unknown>,
-  processorOptions?: SWRParamsProcessorOptions
+  processorOptions?: SWRParamsProcessorOptions,
 ): string {
   return buildUrlWithParams(url, paramsKey, params, processorOptions);
 }

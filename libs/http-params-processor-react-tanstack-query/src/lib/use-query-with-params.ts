@@ -1,15 +1,15 @@
 import {
-  useQuery,
-  UseQueryOptions,
-  UseQueryResult,
-  QueryKey,
-  queryOptions,
-} from '@tanstack/react-query';
-import {
-  ParamsProcessor,
   IKeyFormattingStrategy,
   IValueConverter,
+  ParamsProcessor,
 } from '@adaskothebeast/http-params-processor-core';
+import {
+  QueryKey,
+  UseQueryOptions,
+  UseQueryResult,
+  queryOptions,
+  useQuery,
+} from '@tanstack/react-query';
 
 /**
  * Options for the params processor used in query hooks.
@@ -29,8 +29,10 @@ export interface QueryParamsProcessorOptions {
 /**
  * Options for useQueryWithParams hook.
  */
-export interface UseQueryWithParamsOptions<TData, TError = Error>
-  extends Omit<UseQueryOptions<TData, TError, TData, QueryKey>, 'queryKey' | 'queryFn'> {
+export interface UseQueryWithParamsOptions<TData, TError = Error> extends Omit<
+  UseQueryOptions<TData, TError, TData, QueryKey>,
+  'queryKey' | 'queryFn'
+> {
   /**
    * The query key for caching.
    */
@@ -80,7 +82,7 @@ export function buildUrlWithParams(
   url: string,
   paramsKey: string,
   params: Record<string, unknown>,
-  processorOptions?: QueryParamsProcessorOptions
+  processorOptions?: QueryParamsProcessorOptions,
 ): string {
   const processor = new ParamsProcessor({
     keyFormatter: processorOptions?.keyFormatter,
@@ -106,15 +108,20 @@ export function buildUrlWithParams(
 function createQueryFn<TData>(
   options: Pick<
     UseQueryWithParamsOptions<TData>,
-    'url' | 'paramsKey' | 'params' | 'processorOptions' | 'fetchFn' | 'fetchOptions'
-  >
+    | 'url'
+    | 'paramsKey'
+    | 'params'
+    | 'processorOptions'
+    | 'fetchFn'
+    | 'fetchOptions'
+  >,
 ): () => Promise<TData> {
   return async () => {
     const fullUrl = buildUrlWithParams(
       options.url,
       options.paramsKey,
       options.params,
-      options.processorOptions
+      options.processorOptions,
     );
 
     const fetchFn = options.fetchFn ?? fetch;
@@ -155,7 +162,7 @@ function createQueryFn<TData>(
  * ```
  */
 export function useQueryWithParams<TData, TError = Error>(
-  options: UseQueryWithParamsOptions<TData, TError>
+  options: UseQueryWithParamsOptions<TData, TError>,
 ): UseQueryResult<TData, TError> {
   const {
     queryKey,
@@ -246,9 +253,17 @@ export interface CreateQueryOptionsWithParamsOptions<TData> {
  * ```
  */
 export function createQueryOptionsWithParams<TData>(
-  options: CreateQueryOptionsWithParamsOptions<TData>
+  options: CreateQueryOptionsWithParamsOptions<TData>,
 ) {
-  const { queryKey, url, paramsKey, params, processorOptions, fetchFn, fetchOptions } = options;
+  const {
+    queryKey,
+    url,
+    paramsKey,
+    params,
+    processorOptions,
+    fetchFn,
+    fetchOptions,
+  } = options;
 
   return queryOptions<TData>({
     queryKey: [...queryKey, paramsKey, params],
@@ -287,7 +302,7 @@ export function getProcessedUrl(
   url: string,
   paramsKey: string,
   params: Record<string, unknown>,
-  processorOptions?: QueryParamsProcessorOptions
+  processorOptions?: QueryParamsProcessorOptions,
 ): string {
   return buildUrlWithParams(url, paramsKey, params, processorOptions);
 }

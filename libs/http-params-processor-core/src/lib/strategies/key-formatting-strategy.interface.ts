@@ -68,6 +68,6 @@ export interface IKeyFormattingStrategy {
   transformComplexObject?<T extends IParamsAppender>(
     params: T,
     key: string,
-    obj: Record<string, unknown> | unknown[]
+    obj: Record<string, unknown> | unknown[],
   ): T | null;
 }

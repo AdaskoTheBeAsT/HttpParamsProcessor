@@ -1,4 +1,5 @@
 import { IParamsAppender } from '@adaskothebeast/http-params-processor-core';
+
 import { JsonKeyFormattingStrategy } from './json-key-formatting.strategy';
 
 class MockParams implements IParamsAppender {
@@ -67,7 +68,9 @@ describe('JsonKeyFormattingStrategy', () => {
       const result = strategy.transformComplexObject(params, 'data', obj);
 
       expect(result).not.toBeNull();
-      expect(result!.get('data')).toBe('{"user":{"name":"John","age":30},"active":true}');
+      expect(result!.get('data')).toBe(
+        '{"user":{"name":"John","age":30},"active":true}',
+      );
     });
   });
 });

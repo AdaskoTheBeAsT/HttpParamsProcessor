@@ -25,14 +25,14 @@ describe('IsoDateValueToStrategy', () => {
     it('should convert Date to ISO 8601 string', () => {
       const date = new Date('2024-01-01T00:00:00.000Z');
       const result = strategy.serializeValue(date);
-      
+
       expect(result).toBe('2024-01-01T00:00:00.000Z');
     });
 
     it('should preserve milliseconds', () => {
       const date = new Date('2024-01-01T12:30:45.123Z');
       const result = strategy.serializeValue(date);
-      
+
       expect(result).toBe('2024-01-01T12:30:45.123Z');
     });
   });

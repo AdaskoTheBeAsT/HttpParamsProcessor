@@ -4,7 +4,10 @@ import { DateTime } from 'luxon';
 /**
  * Strategy to normalize Luxon DateTime objects to native JavaScript Date.
  */
-export class LuxonDateTimeValueFromStrategy implements IValueFromStrategy<DateTime, Date> {
+export class LuxonDateTimeValueFromStrategy implements IValueFromStrategy<
+  DateTime,
+  Date
+> {
   normalizeValue(value: DateTime): Date {
     return value.toJSDate();
   }

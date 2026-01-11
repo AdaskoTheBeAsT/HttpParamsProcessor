@@ -1,4 +1,7 @@
-import { IValueToStrategy, PeriodComponents } from '@adaskothebeast/http-params-processor-core';
+import {
+  IValueToStrategy,
+  PeriodComponents,
+} from '@adaskothebeast/http-params-processor-core';
 
 /**
  * Strategy to serialize PeriodComponents to ISO 8601 period format.
@@ -22,11 +25,14 @@ export class IsoPeriodValueToStrategy implements IValueToStrategy<PeriodComponen
     }
     const obj = value as Record<string, unknown>;
     const validKeys = new Set(['years', 'months', 'weeks', 'days']);
-    const hasOnlyPeriodKeys = Object.keys(obj).every(key =>
-      validKeys.has(key) || obj[key] === undefined
+    const hasOnlyPeriodKeys = Object.keys(obj).every(
+      (key) => validKeys.has(key) || obj[key] === undefined,
     );
-    return hasOnlyPeriodKeys && Object.keys(obj).some(key =>
-      validKeys.has(key) && typeof obj[key] === 'number'
+    return (
+      hasOnlyPeriodKeys &&
+      Object.keys(obj).some(
+        (key) => validKeys.has(key) && typeof obj[key] === 'number',
+      )
     );
   }
 }

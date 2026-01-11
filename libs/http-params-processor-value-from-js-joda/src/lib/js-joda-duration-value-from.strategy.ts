@@ -1,10 +1,16 @@
-import { IValueFromStrategy, DurationComponents } from '@adaskothebeast/http-params-processor-core';
+import {
+  DurationComponents,
+  IValueFromStrategy,
+} from '@adaskothebeast/http-params-processor-core';
 import { Duration } from '@js-joda/core';
 
 /**
  * Strategy to normalize js-joda Duration objects to DurationComponents.
  */
-export class JsJodaDurationValueFromStrategy implements IValueFromStrategy<Duration, DurationComponents> {
+export class JsJodaDurationValueFromStrategy implements IValueFromStrategy<
+  Duration,
+  DurationComponents
+> {
   normalizeValue(value: Duration): DurationComponents {
     const totalSeconds = value.seconds();
     const hours = Math.floor(totalSeconds / 3600);

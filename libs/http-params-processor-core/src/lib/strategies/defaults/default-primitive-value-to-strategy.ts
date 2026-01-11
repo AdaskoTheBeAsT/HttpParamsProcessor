@@ -5,9 +5,7 @@ type Primitive = string | number | boolean;
 /**
  * Default strategy for serializing primitive values (string, number, boolean) to strings.
  */
-export class DefaultPrimitiveValueToStrategy
-  implements IValueToStrategy<Primitive>
-{
+export class DefaultPrimitiveValueToStrategy implements IValueToStrategy<Primitive> {
   serializeValue: (value: Primitive) => string = String;
 
   canHandle(value: unknown): value is Primitive {

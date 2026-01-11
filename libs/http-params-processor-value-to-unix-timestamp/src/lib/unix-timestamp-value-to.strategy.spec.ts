@@ -33,14 +33,14 @@ describe('UnixTimestampValueToStrategy', () => {
     it('should convert Date to Unix timestamp string', () => {
       const date = new Date('2024-01-01T00:00:00.000Z');
       const result = strategy.serializeValue(date);
-      
+
       expect(result).toBe('1704067200');
     });
 
     it('should truncate milliseconds', () => {
       const date = new Date('2024-01-01T00:00:00.999Z');
       const result = strategy.serializeValue(date);
-      
+
       expect(result).toBe('1704067200');
     });
 
@@ -48,7 +48,7 @@ describe('UnixTimestampValueToStrategy', () => {
       const date = new Date('2024-06-15T14:30:45.000Z');
       const result = strategy.serializeValue(date);
       const expected = Math.floor(date.getTime() / 1000).toString();
-      
+
       expect(result).toBe(expected);
     });
   });

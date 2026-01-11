@@ -5,12 +5,13 @@ import { IValueToStrategy } from './value-to-strategy.interface';
 /**
  * Implementation of IValueConverter that pairs a value-from and value-to strategy.
  */
-export class ValueConverter<TFrom, TIntermediate>
-  implements IValueConverter<TFrom, TIntermediate>
-{
+export class ValueConverter<TFrom, TIntermediate> implements IValueConverter<
+  TFrom,
+  TIntermediate
+> {
   constructor(
     public readonly from: IValueFromStrategy<TFrom, TIntermediate>,
-    public readonly to: IValueToStrategy<TIntermediate>
+    public readonly to: IValueToStrategy<TIntermediate>,
   ) {}
 
   canHandle(value: unknown): value is TFrom {
@@ -34,7 +35,7 @@ export class ValueConverter<TFrom, TIntermediate>
  */
 export function createValueConverter<TFrom, TIntermediate>(
   from: IValueFromStrategy<TFrom, TIntermediate>,
-  to: IValueToStrategy<TIntermediate>
+  to: IValueToStrategy<TIntermediate>,
 ): ValueConverter<TFrom, TIntermediate> {
   return new ValueConverter(from, to);
 }

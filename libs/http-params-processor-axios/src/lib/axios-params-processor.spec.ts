@@ -1,9 +1,10 @@
+import { IKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-core';
+
 import {
   AxiosParamsProcessor,
   createAxiosParamsProcessor,
   createParamsSerializer,
 } from './axios-params-processor';
-import { IKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-core';
 
 describe('AxiosParamsProcessor', () => {
   let processor: AxiosParamsProcessor;
@@ -14,7 +15,10 @@ describe('AxiosParamsProcessor', () => {
 
   describe('serialize', () => {
     it('should serialize simple object with encoding', () => {
-      const result = processor.serialize('filter', { status: 'active', count: 10 });
+      const result = processor.serialize('filter', {
+        status: 'active',
+        count: 10,
+      });
 
       expect(result).toBe('filter.status=active&filter.count=10');
     });
@@ -43,7 +47,7 @@ describe('AxiosParamsProcessor', () => {
       const result = processor.serialize(
         'filter',
         { query: 'hello world' },
-        { encode: false }
+        { encode: false },
       );
 
       expect(result).toBe('filter.query=hello world');
@@ -57,7 +61,10 @@ describe('AxiosParamsProcessor', () => {
     });
 
     it('should handle boolean values', () => {
-      const result = processor.serialize('filter', { active: true, deleted: false });
+      const result = processor.serialize('filter', {
+        active: true,
+        deleted: false,
+      });
 
       expect(result).toBe('filter.active=true&filter.deleted=false');
     });
@@ -95,7 +102,9 @@ describe('AxiosParamsProcessor', () => {
     });
 
     it('should respect options passed to createSerializer', () => {
-      const serializer = processor.createSerializer('filter', { encode: false });
+      const serializer = processor.createSerializer('filter', {
+        encode: false,
+      });
       const result = serializer({ query: 'hello world' });
 
       expect(result).toBe('filter.query=hello world');

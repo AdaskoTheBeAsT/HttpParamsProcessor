@@ -1,14 +1,14 @@
-import { inject, Injector, Signal } from '@angular/core';
 import {
-  httpResource,
+  HttpParamsProcessorOptions,
+  HttpParamsProcessorService,
+} from '@adaskothebeast/http-params-processor-angular';
+import {
   HttpResourceOptions,
   HttpResourceRef,
   HttpResourceRequest,
+  httpResource,
 } from '@angular/common/http';
-import {
-  HttpParamsProcessorService,
-  HttpParamsProcessorOptions,
-} from '@adaskothebeast/http-params-processor-angular';
+import { Injector, Signal, inject } from '@angular/core';
 
 /**
  * Options for httpResourceWithParams.
@@ -28,7 +28,9 @@ export interface HttpResourceWithParamsOptions<TResult, TRaw = unknown> {
    * The complex object to be processed into query parameters.
    * Can be a signal or a function returning the params object.
    */
-  paramsValue: Signal<Record<string, unknown> | undefined> | (() => Record<string, unknown> | undefined);
+  paramsValue:
+    | Signal<Record<string, unknown> | undefined>
+    | (() => Record<string, unknown> | undefined);
 
   /**
    * Options for the HttpParamsProcessor.
@@ -48,7 +50,9 @@ export interface HttpResourceWithParamsOptions<TResult, TRaw = unknown> {
   /**
    * HTTP headers for the request.
    */
-  headers?: Record<string, string | string[]> | (() => Record<string, string | string[]>);
+  headers?:
+    | Record<string, string | string[]>
+    | (() => Record<string, string | string[]>);
 
   /**
    * Request body (for POST, PUT, etc.).
@@ -124,13 +128,13 @@ export interface HttpResourceWithParamsOptions<TResult, TRaw = unknown> {
  * ```
  */
 export function httpResourceWithParams<TResult>(
-  options: HttpResourceWithParamsOptions<TResult> & { defaultValue: TResult }
+  options: HttpResourceWithParamsOptions<TResult> & { defaultValue: TResult },
 ): HttpResourceRef<TResult>;
 export function httpResourceWithParams<TResult>(
-  options: HttpResourceWithParamsOptions<TResult>
+  options: HttpResourceWithParamsOptions<TResult>,
 ): HttpResourceRef<TResult | undefined>;
 export function httpResourceWithParams<TResult>(
-  options: HttpResourceWithParamsOptions<TResult>
+  options: HttpResourceWithParamsOptions<TResult>,
 ): HttpResourceRef<TResult | undefined> {
   const processor = inject(HttpParamsProcessorService);
   const injector = inject(Injector);
@@ -142,9 +146,12 @@ export function httpResourceWithParams<TResult>(
       return undefined;
     }
 
-    const paramsObj = typeof options.paramsValue === 'function'
-      ? (options.paramsValue as () => Record<string, unknown> | undefined)()
-      : (options.paramsValue as Signal<Record<string, unknown> | undefined>)();
+    const paramsObj =
+      typeof options.paramsValue === 'function'
+        ? (options.paramsValue as () => Record<string, unknown> | undefined)()
+        : (
+            options.paramsValue as Signal<Record<string, unknown> | undefined>
+          )();
 
     if (paramsObj === undefined) {
       return undefined;
@@ -153,7 +160,7 @@ export function httpResourceWithParams<TResult>(
     const httpParams = processor.process(
       options.paramsKey,
       paramsObj,
-      options.processorOptions
+      options.processorOptions,
     );
 
     const params: Record<string, string | string[]> = {
@@ -174,9 +181,10 @@ export function httpResourceWithParams<TResult>(
     };
 
     if (options.headers) {
-      request.headers = typeof options.headers === 'function'
-        ? options.headers()
-        : options.headers;
+      request.headers =
+        typeof options.headers === 'function'
+          ? options.headers()
+          : options.headers;
     }
 
     if (options.body !== undefined) {
@@ -197,7 +205,8 @@ export function httpResourceWithParams<TResult>(
   const resourceOptions: HttpResourceOptions<TResult, unknown> = {};
 
   if (options.defaultValue !== undefined) {
-    (resourceOptions as { defaultValue: TResult }).defaultValue = options.defaultValue;
+    (resourceOptions as { defaultValue: TResult }).defaultValue =
+      options.defaultValue;
   }
 
   if (options.equal !== undefined) {
@@ -205,7 +214,11 @@ export function httpResourceWithParams<TResult>(
   }
 
   if (options.map !== undefined) {
-    (resourceOptions as HttpResourceOptions<TResult, unknown> & { map?: (value: unknown) => TResult }).map = options.map;
+    (
+      resourceOptions as HttpResourceOptions<TResult, unknown> & {
+        map?: (value: unknown) => TResult;
+      }
+    ).map = options.map;
   }
 
   resourceOptions.injector = options.injector ?? injector;
@@ -216,8 +229,10 @@ export function httpResourceWithParams<TResult>(
 /**
  * Options for creating a reactive httpResource with params.
  */
-export interface ReactiveHttpResourceWithParamsOptions<T, P extends Record<string, unknown>>
-  extends Omit<HttpResourceWithParamsOptions<T>, 'paramsValue'> {
+export interface ReactiveHttpResourceWithParamsOptions<
+  T,
+  P extends Record<string, unknown>,
+> extends Omit<HttpResourceWithParamsOptions<T>, 'paramsValue'> {
   /**
    * A function that returns the params object based on reactive signals.
    */
@@ -249,14 +264,25 @@ export interface ReactiveHttpResourceWithParamsOptions<T, P extends Record<strin
  * statusFilter.set('inactive');
  * ```
  */
-export function reactiveHttpResourceWithParams<TResult, P extends Record<string, unknown>>(
-  options: ReactiveHttpResourceWithParamsOptions<TResult, P> & { defaultValue: TResult }
+export function reactiveHttpResourceWithParams<
+  TResult,
+  P extends Record<string, unknown>,
+>(
+  options: ReactiveHttpResourceWithParamsOptions<TResult, P> & {
+    defaultValue: TResult;
+  },
 ): HttpResourceRef<TResult>;
-export function reactiveHttpResourceWithParams<TResult, P extends Record<string, unknown>>(
-  options: ReactiveHttpResourceWithParamsOptions<TResult, P>
+export function reactiveHttpResourceWithParams<
+  TResult,
+  P extends Record<string, unknown>,
+>(
+  options: ReactiveHttpResourceWithParamsOptions<TResult, P>,
 ): HttpResourceRef<TResult | undefined>;
-export function reactiveHttpResourceWithParams<TResult, P extends Record<string, unknown>>(
-  options: ReactiveHttpResourceWithParamsOptions<TResult, P>
+export function reactiveHttpResourceWithParams<
+  TResult,
+  P extends Record<string, unknown>,
+>(
+  options: ReactiveHttpResourceWithParamsOptions<TResult, P>,
 ): HttpResourceRef<TResult | undefined> {
   return httpResourceWithParams<TResult>({
     ...options,

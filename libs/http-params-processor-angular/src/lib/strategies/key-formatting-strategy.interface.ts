@@ -16,13 +16,13 @@ export interface IKeyFormattingStrategy {
    * @param propertyKey - The property key
    * @returns Formatted key string
    * @example
-   * // Dot Notation Strategy
+   * /// Dot Notation Strategy
    * formatObjectKey('user', 'name') => 'user.name'
    *
-   * // Bracket Notation Strategy
+   * /// Bracket Notation Strategy
    * formatObjectKey('user', 'name') => 'user[name]'
    *
-   * // Flat Underscore Strategy
+   * /// Flat Underscore Strategy
    * formatObjectKey('user', 'name') => 'user_name'
    */
   formatObjectKey(parentKey: string, propertyKey: string): string;
@@ -33,13 +33,13 @@ export interface IKeyFormattingStrategy {
    * @param index - The array index
    * @returns Formatted key string
    * @example
-   * // Bracket Notation Strategy (default)
+   * /// Bracket Notation Strategy (default)
    * formatArrayKey('items', 0) => 'items[0]'
    *
-   * // Dot Notation Strategy
+   * /// Dot Notation Strategy
    * formatArrayKey('items', 0) => 'items.0'
    *
-   * // Flat Underscore Strategy
+   * /// Flat Underscore Strategy
    * formatArrayKey('items', 0) => 'items_0'
    */
   formatArrayKey(parentKey: string, index: number): string;
@@ -52,16 +52,16 @@ export interface IKeyFormattingStrategy {
    * @param obj - The complex object
    * @returns Updated HttpParams or null to use default recursion
    * @example
-   * // JSON String Strategy
+   * /// JSON String Strategy
    * transformComplexObject(params, 'filter', { status: 'active' })
    *   => params.append('filter', '{"status":"active"}')
    *
-   * // Default (null = use recursion)
+   * /// Default (null = use recursion)
    * transformComplexObject(params, 'filter', { status: 'active' }) => null
    */
   transformComplexObject?(
     params: HttpParams,
     key: string,
-    obj: Record<string, unknown> | unknown[]
+    obj: Record<string, unknown> | unknown[],
   ): HttpParams | null;
 }

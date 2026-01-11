@@ -1,10 +1,11 @@
+import { IKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-core';
+
 import {
   FetchParamsProcessor,
-  createFetchParamsProcessor,
   buildFetchUrl,
+  createFetchParamsProcessor,
   toFetchParams,
 } from './fetch-params-processor';
-import { IKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-core';
 
 describe('FetchParamsProcessor', () => {
   let processor: FetchParamsProcessor;
@@ -15,7 +16,9 @@ describe('FetchParamsProcessor', () => {
 
   describe('toURLSearchParams', () => {
     it('should create URLSearchParams instance', () => {
-      const result = processor.toURLSearchParams('filter', { status: 'active' });
+      const result = processor.toURLSearchParams('filter', {
+        status: 'active',
+      });
 
       expect(result).toBeInstanceOf(URLSearchParams);
       expect(result.get('filter.status')).toBe('active');
@@ -128,7 +131,7 @@ describe('FetchParamsProcessor', () => {
       });
 
       expect(result).toBe(
-        '/api/products?filter.category=electronics&filter.price.min=100&filter.price.max=500'
+        '/api/products?filter.category=electronics&filter.price.min=100&filter.price.max=500',
       );
     });
   });
@@ -138,7 +141,7 @@ describe('FetchParamsProcessor', () => {
       const result = processor.buildUrlObject(
         'https://api.example.com/products',
         'filter',
-        { category: 'electronics' }
+        { category: 'electronics' },
       );
 
       expect(result).toBeInstanceOf(URL);
@@ -168,7 +171,9 @@ describe('FetchParamsProcessor', () => {
   describe('appendTo', () => {
     it('should append to existing URLSearchParams', () => {
       const existing = new URLSearchParams({ page: '1', size: '10' });
-      const result = processor.appendTo(existing, 'filter', { status: 'active' });
+      const result = processor.appendTo(existing, 'filter', {
+        status: 'active',
+      });
 
       expect(result).toBe(existing);
       expect(result.get('page')).toBe('1');
@@ -240,7 +245,9 @@ describe('buildFetchUrl', () => {
       inStock: true,
     });
 
-    expect(url).toBe('/api/products?filter.category=electronics&filter.inStock=true');
+    expect(url).toBe(
+      '/api/products?filter.category=electronics&filter.inStock=true',
+    );
   });
 
   it('should accept config', () => {
@@ -253,7 +260,7 @@ describe('buildFetchUrl', () => {
       '/api/products',
       'filter',
       { status: 'active' },
-      { keyFormatter: customFormatter }
+      { keyFormatter: customFormatter },
     );
 
     expect(url).toBe('/api/products?filter_status=active');
@@ -274,7 +281,11 @@ describe('toFetchParams', () => {
       formatArrayKey: (parent, index) => `${parent}_${index}`,
     };
 
-    const params = toFetchParams('filter', { status: 'active' }, { keyFormatter: customFormatter });
+    const params = toFetchParams(
+      'filter',
+      { status: 'active' },
+      { keyFormatter: customFormatter },
+    );
 
     expect(params.get('filter_status')).toBe('active');
   });

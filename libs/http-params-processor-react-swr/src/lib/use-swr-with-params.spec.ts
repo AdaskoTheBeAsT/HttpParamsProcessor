@@ -4,7 +4,7 @@ import { ParamsProcessor } from '@adaskothebeast/http-params-processor-core';
 function buildUrlWithParams(
   url: string,
   paramsKey: string,
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
 ): string {
   const processor = new ParamsProcessor();
   const queryString = processor.toQueryString(paramsKey, params);
@@ -20,7 +20,7 @@ function buildUrlWithParams(
 function getProcessedUrl(
   url: string,
   paramsKey: string,
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
 ): string {
   return buildUrlWithParams(url, paramsKey, params);
 }
@@ -28,7 +28,7 @@ function getProcessedUrl(
 function createSWRKey(
   url: string,
   paramsKey: string,
-  params: Record<string, unknown>
+  params: Record<string, unknown>,
 ): string {
   return buildUrlWithParams(url, paramsKey, params);
 }
@@ -56,7 +56,9 @@ describe('buildUrlWithParams', () => {
       roles: ['admin', 'user'],
     });
 
-    expect(url).toBe('/api/users?filter.roles%5B0%5D=admin&filter.roles%5B1%5D=user');
+    expect(url).toBe(
+      '/api/users?filter.roles%5B0%5D=admin&filter.roles%5B1%5D=user',
+    );
   });
 
   it('should handle Date objects', () => {
@@ -65,7 +67,9 @@ describe('buildUrlWithParams', () => {
       createdAt: date,
     });
 
-    expect(url).toBe('/api/users?filter.createdAt=2024-01-01T00%3A00%3A00.000Z');
+    expect(url).toBe(
+      '/api/users?filter.createdAt=2024-01-01T00%3A00%3A00.000Z',
+    );
   });
 
   it('should append to existing query params', () => {

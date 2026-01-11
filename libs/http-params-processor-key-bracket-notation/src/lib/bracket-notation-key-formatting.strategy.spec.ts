@@ -13,7 +13,9 @@ describe('BracketNotationKeyFormattingStrategy', () => {
     });
 
     it('should format nested property', () => {
-      expect(strategy.formatObjectKey('user[profile]', 'email')).toBe('user[profile][email]');
+      expect(strategy.formatObjectKey('user[profile]', 'email')).toBe(
+        'user[profile][email]',
+      );
     });
 
     it('should handle numeric property keys', () => {

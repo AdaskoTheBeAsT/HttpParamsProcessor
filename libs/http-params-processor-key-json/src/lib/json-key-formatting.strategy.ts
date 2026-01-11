@@ -1,4 +1,7 @@
-import { IKeyFormattingStrategy, IParamsAppender } from '@adaskothebeast/http-params-processor-core';
+import {
+  IKeyFormattingStrategy,
+  IParamsAppender,
+} from '@adaskothebeast/http-params-processor-core';
 
 /**
  * Strategy that serializes complex objects/arrays as JSON strings.
@@ -13,7 +16,11 @@ export class JsonKeyFormattingStrategy implements IKeyFormattingStrategy {
     return `${parentKey}[${index}]`;
   }
 
-  transformComplexObject<T extends IParamsAppender>(params: T, key: string, obj: Record<string, unknown> | unknown[]): T | null {
+  transformComplexObject<T extends IParamsAppender>(
+    params: T,
+    key: string,
+    obj: Record<string, unknown> | unknown[],
+  ): T | null {
     return params.append(key, JSON.stringify(obj)) as T;
   }
 }

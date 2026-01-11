@@ -1,9 +1,9 @@
 import {
+  IKeyFormattingStrategy,
+  IValueConverter,
   ParamsProcessor,
   ParamsProcessorOptions,
   ProcessableInput,
-  IKeyFormattingStrategy,
-  IValueConverter,
 } from '@adaskothebeast/http-params-processor-core';
 
 /**
@@ -67,7 +67,7 @@ export class AxiosParamsProcessor {
   serialize(
     key: string,
     obj: ProcessableInput,
-    options?: AxiosParamsProcessorOptions
+    options?: AxiosParamsProcessorOptions,
   ): string {
     const encode = options?.encode ?? true;
     const entries = this.processor.process(key, obj, options);
@@ -105,7 +105,7 @@ export class AxiosParamsProcessor {
    */
   createSerializer(
     key: string,
-    options?: AxiosParamsProcessorOptions
+    options?: AxiosParamsProcessorOptions,
   ): (params: ProcessableInput) => string {
     return (params: ProcessableInput) => this.serialize(key, params, options);
   }
@@ -131,7 +131,7 @@ export class AxiosParamsProcessor {
   toParams(
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): Record<string, string | string[]> {
     return this.processor.toPlainObject(key, obj, options);
   }
@@ -161,7 +161,7 @@ export class AxiosParamsProcessor {
  * ```
  */
 export function createAxiosParamsProcessor(
-  config?: AxiosParamsProcessorConfig
+  config?: AxiosParamsProcessorConfig,
 ): AxiosParamsProcessor {
   return new AxiosParamsProcessor(config);
 }
@@ -186,7 +186,7 @@ export function createAxiosParamsProcessor(
  */
 export function createParamsSerializer(
   key: string,
-  config?: AxiosParamsProcessorConfig
+  config?: AxiosParamsProcessorConfig,
 ): (params: ProcessableInput) => string {
   const processor = new AxiosParamsProcessor(config);
   return processor.createSerializer(key);

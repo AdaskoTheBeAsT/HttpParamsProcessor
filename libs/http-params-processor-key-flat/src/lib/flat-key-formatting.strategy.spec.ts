@@ -14,7 +14,9 @@ describe('FlatKeyFormattingStrategy', () => {
       });
 
       it('should format nested property', () => {
-        expect(strategy.formatObjectKey('user_profile', 'email')).toBe('user_profile_email');
+        expect(strategy.formatObjectKey('user_profile', 'email')).toBe(
+          'user_profile_email',
+        );
       });
     });
 

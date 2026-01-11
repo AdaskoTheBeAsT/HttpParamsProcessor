@@ -1,10 +1,16 @@
-import { IValueFromStrategy, DurationComponents } from '@adaskothebeast/http-params-processor-core';
+import {
+  DurationComponents,
+  IValueFromStrategy,
+} from '@adaskothebeast/http-params-processor-core';
 import { Duration } from 'luxon';
 
 /**
  * Strategy to normalize Luxon Duration objects to DurationComponents.
  */
-export class LuxonDurationValueFromStrategy implements IValueFromStrategy<Duration, DurationComponents> {
+export class LuxonDurationValueFromStrategy implements IValueFromStrategy<
+  Duration,
+  DurationComponents
+> {
   normalizeValue(value: Duration): DurationComponents {
     const obj = value.toObject();
     return {

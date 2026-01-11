@@ -43,7 +43,12 @@ describe('IsoPeriodValueToStrategy', () => {
     });
 
     it('should format full period', () => {
-      const result = strategy.serializeValue({ years: 1, months: 2, weeks: 3, days: 4 });
+      const result = strategy.serializeValue({
+        years: 1,
+        months: 2,
+        weeks: 3,
+        days: 4,
+      });
       expect(result).toBe('P1Y2M3W4D');
     });
   });

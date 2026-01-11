@@ -1,4 +1,5 @@
-import { Duration, DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
+
 import { LuxonDurationValueFromStrategy } from './luxon-duration-value-from.strategy';
 
 describe('LuxonDurationValueFromStrategy', () => {
@@ -22,7 +23,7 @@ describe('LuxonDurationValueFromStrategy', () => {
     it('should convert duration with hours and minutes', () => {
       const dur = Duration.fromObject({ hours: 1, minutes: 30 });
       const result = strategy.normalizeValue(dur);
-      
+
       expect(result.hours).toBe(1);
       expect(result.minutes).toBe(30);
     });
@@ -35,10 +36,10 @@ describe('LuxonDurationValueFromStrategy', () => {
         hours: 4,
         minutes: 5,
         seconds: 6,
-        milliseconds: 7
+        milliseconds: 7,
       });
       const result = strategy.normalizeValue(dur);
-      
+
       expect(result.years).toBe(1);
       expect(result.months).toBe(2);
       expect(result.days).toBe(3);

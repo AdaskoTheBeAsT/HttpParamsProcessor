@@ -5,7 +5,10 @@ import { Moment } from 'moment';
 /**
  * Strategy to normalize Moment date objects to native JavaScript Date.
  */
-export class MomentDateValueFromStrategy implements IValueFromStrategy<Moment, Date> {
+export class MomentDateValueFromStrategy implements IValueFromStrategy<
+  Moment,
+  Date
+> {
   normalizeValue(value: Moment): Date {
     return value.toDate();
   }

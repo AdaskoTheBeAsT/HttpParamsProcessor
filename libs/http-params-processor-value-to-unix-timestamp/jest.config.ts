@@ -1,4 +1,5 @@
-const reportPath = '.reports/libs/http-params-processor-value-to-unix-timestamp/';
+const reportPath =
+  '.reports/libs/http-params-processor-value-to-unix-timestamp/';
 const reportName = 'test-report';
 
 export default {

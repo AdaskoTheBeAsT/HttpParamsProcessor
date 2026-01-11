@@ -14,7 +14,9 @@ describe('CustomDelimiterKeyFormattingStrategy', () => {
       });
 
       it('should format nested property', () => {
-        expect(strategy.formatObjectKey('user:profile', 'email')).toBe('user:profile:email');
+        expect(strategy.formatObjectKey('user:profile', 'email')).toBe(
+          'user:profile:email',
+        );
       });
     });
 
@@ -37,7 +39,10 @@ describe('CustomDelimiterKeyFormattingStrategy', () => {
     });
 
     it('should use delimiter format for arrays', () => {
-      const strategy = new CustomDelimiterKeyFormattingStrategy(':', 'delimiter');
+      const strategy = new CustomDelimiterKeyFormattingStrategy(
+        ':',
+        'delimiter',
+      );
       expect(strategy.formatArrayKey('items', 2)).toBe('items:2');
     });
   });

@@ -202,10 +202,10 @@ export class HttpParamsProcessorService {
       typeof obj === 'object' &&
       Object.prototype.toString.call(obj) !== '[object Date]'
     ) {
-      if (visited.has(obj as object)) {
+      if (visited.has(obj)) {
         throw new Error(`Circular reference detected at key: ${key}`);
       }
-      visited.add(obj as object);
+      visited.add(obj);
       return this.processObject(
         params,
         key,

@@ -1,4 +1,7 @@
-import { IValueToStrategy, DurationComponents } from '@adaskothebeast/http-params-processor-core';
+import {
+  DurationComponents,
+  IValueToStrategy,
+} from '@adaskothebeast/http-params-processor-core';
 
 /**
  * Strategy to serialize DurationComponents to ISO 8601 duration format.
@@ -21,8 +24,19 @@ export class IsoDurationValueToStrategy implements IValueToStrategy<DurationComp
       return false;
     }
     const obj = value as Record<string, unknown>;
-    const validKeys = new Set(['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']);
-    return Object.keys(obj).some(key => validKeys.has(key) && typeof obj[key] === 'number');
+    const validKeys = new Set([
+      'years',
+      'months',
+      'weeks',
+      'days',
+      'hours',
+      'minutes',
+      'seconds',
+      'milliseconds',
+    ]);
+    return Object.keys(obj).some(
+      (key) => validKeys.has(key) && typeof obj[key] === 'number',
+    );
   }
 
   private buildDatePart(value: DurationComponents): string {
@@ -39,7 +53,9 @@ export class IsoDurationValueToStrategy implements IValueToStrategy<DurationComp
     if (value.hours) result += `${value.hours}H`;
     if (value.minutes) result += `${value.minutes}M`;
 
-    const seconds = (value.seconds || 0) + (value.milliseconds ? value.milliseconds / 1000 : 0);
+    const seconds =
+      (value.seconds || 0) +
+      (value.milliseconds ? value.milliseconds / 1000 : 0);
     if (seconds) {
       result += `${seconds}S`;
     }

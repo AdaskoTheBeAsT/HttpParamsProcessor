@@ -1,4 +1,7 @@
-import { IValueFromStrategy, DurationComponents } from '@adaskothebeast/http-params-processor-core';
+import {
+  DurationComponents,
+  IValueFromStrategy,
+} from '@adaskothebeast/http-params-processor-core';
 import * as moment from 'moment';
 
 type MomentDuration = moment.Duration;
@@ -6,7 +9,10 @@ type MomentDuration = moment.Duration;
 /**
  * Strategy to normalize Moment Duration objects to DurationComponents.
  */
-export class MomentDurationValueFromStrategy implements IValueFromStrategy<MomentDuration, DurationComponents> {
+export class MomentDurationValueFromStrategy implements IValueFromStrategy<
+  MomentDuration,
+  DurationComponents
+> {
   normalizeValue(value: MomentDuration): DurationComponents {
     return {
       years: value.years() || undefined,

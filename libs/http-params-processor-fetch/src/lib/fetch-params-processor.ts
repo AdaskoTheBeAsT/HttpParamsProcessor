@@ -1,9 +1,9 @@
 import {
+  IKeyFormattingStrategy,
+  IValueConverter,
   ParamsProcessor,
   ParamsProcessorOptions,
   ProcessableInput,
-  IKeyFormattingStrategy,
-  IValueConverter,
 } from '@adaskothebeast/http-params-processor-core';
 
 /**
@@ -59,7 +59,7 @@ export class FetchParamsProcessor {
   toURLSearchParams(
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): URLSearchParams {
     return this.processor.toURLSearchParams(key, obj, options);
   }
@@ -83,7 +83,7 @@ export class FetchParamsProcessor {
   toQueryString(
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): string {
     return this.processor.toQueryString(key, obj, options);
   }
@@ -113,7 +113,7 @@ export class FetchParamsProcessor {
     baseUrl: string,
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): string {
     const queryString = this.toQueryString(key, obj, options);
     if (!queryString) {
@@ -147,7 +147,7 @@ export class FetchParamsProcessor {
     baseUrl: string | URL,
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): URL {
     const url = new URL(baseUrl.toString());
     const params = this.toURLSearchParams(key, obj, options);
@@ -182,7 +182,7 @@ export class FetchParamsProcessor {
     existingParams: URLSearchParams,
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): URLSearchParams {
     const newParams = this.toURLSearchParams(key, obj, options);
 
@@ -219,7 +219,7 @@ export class FetchParamsProcessor {
  * ```
  */
 export function createFetchParamsProcessor(
-  config?: FetchParamsProcessorConfig
+  config?: FetchParamsProcessorConfig,
 ): FetchParamsProcessor {
   return new FetchParamsProcessor(config);
 }
@@ -243,7 +243,7 @@ export function buildFetchUrl(
   baseUrl: string,
   key: string,
   obj: ProcessableInput,
-  config?: FetchParamsProcessorConfig
+  config?: FetchParamsProcessorConfig,
 ): string {
   const processor = new FetchParamsProcessor(config);
   return processor.buildUrl(baseUrl, key, obj);
@@ -264,7 +264,7 @@ export function buildFetchUrl(
 export function toFetchParams(
   key: string,
   obj: ProcessableInput,
-  config?: FetchParamsProcessorConfig
+  config?: FetchParamsProcessorConfig,
 ): URLSearchParams {
   const processor = new FetchParamsProcessor(config);
   return processor.toURLSearchParams(key, obj);

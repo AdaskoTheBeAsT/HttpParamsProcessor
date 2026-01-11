@@ -1,6 +1,6 @@
 {
-  "name": "http-params-processor-angular",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "http-params-processor-angular",
   "sourceRoot": "libs/http-params-processor-angular/src",
   "prefix": "adaskothebeast",
   "projectType": "library",

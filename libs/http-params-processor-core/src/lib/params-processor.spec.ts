@@ -9,7 +9,10 @@ describe('ParamsProcessor', () => {
 
   describe('process', () => {
     it('should process simple object', () => {
-      const result = processor.process('filter', { status: 'active', count: 10 });
+      const result = processor.process('filter', {
+        status: 'active',
+        count: 10,
+      });
 
       expect(result).toEqual([
         ['filter.status', 'active'],
@@ -64,11 +67,16 @@ describe('ParamsProcessor', () => {
       const date = new Date('2024-01-01T00:00:00.000Z');
       const result = processor.process('filter', { createdAt: date });
 
-      expect(result).toEqual([['filter.createdAt', '2024-01-01T00:00:00.000Z']]);
+      expect(result).toEqual([
+        ['filter.createdAt', '2024-01-01T00:00:00.000Z'],
+      ]);
     });
 
     it('should handle boolean values', () => {
-      const result = processor.process('filter', { active: true, deleted: false });
+      const result = processor.process('filter', {
+        active: true,
+        deleted: false,
+      });
 
       expect(result).toEqual([
         ['filter.active', 'true'],
@@ -95,7 +103,7 @@ describe('ParamsProcessor', () => {
       obj['self'] = obj;
 
       expect(() => processor.process('filter', obj)).toThrow(
-        'Circular reference detected'
+        'Circular reference detected',
       );
     });
 
@@ -133,7 +141,9 @@ describe('ParamsProcessor', () => {
 
   describe('toURLSearchParams', () => {
     it('should create URLSearchParams instance', () => {
-      const result = processor.toURLSearchParams('filter', { status: 'active' });
+      const result = processor.toURLSearchParams('filter', {
+        status: 'active',
+      });
 
       expect(result).toBeInstanceOf(URLSearchParams);
       expect(result.get('filter.status')).toBe('active');

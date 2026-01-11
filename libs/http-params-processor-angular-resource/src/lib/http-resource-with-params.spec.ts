@@ -1,8 +1,12 @@
-import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
-import { httpResourceWithParams, reactiveHttpResourceWithParams } from './http-resource-with-params';
+import { TestBed } from '@angular/core/testing';
+
+import {
+  httpResourceWithParams,
+  reactiveHttpResourceWithParams,
+} from './http-resource-with-params';
 
 interface User {
   id: number;
@@ -12,10 +16,7 @@ interface User {
 describe('httpResourceWithParams', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
   });
 
@@ -154,7 +155,9 @@ describe('httpResourceWithParams', () => {
 
   it('should be idle when params function returns undefined', () => {
     TestBed.runInInjectionContext(() => {
-      const paramsSignal = signal<Record<string, unknown> | undefined>(undefined);
+      const paramsSignal = signal<Record<string, unknown> | undefined>(
+        undefined,
+      );
 
       const resource = httpResourceWithParams<User[]>({
         url: '/api/users',
@@ -187,10 +190,7 @@ describe('httpResourceWithParams', () => {
 describe('reactiveHttpResourceWithParams', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
   });
 
@@ -198,7 +198,10 @@ describe('reactiveHttpResourceWithParams', () => {
     TestBed.runInInjectionContext(() => {
       const statusFilter = signal('active');
 
-      const resource = reactiveHttpResourceWithParams<User[], { status: string }>({
+      const resource = reactiveHttpResourceWithParams<
+        User[],
+        { status: string }
+      >({
         url: '/api/users',
         paramsKey: 'filter',
         params: () => ({
@@ -217,7 +220,10 @@ describe('reactiveHttpResourceWithParams', () => {
       const statusFilter = signal('active');
       const defaultUsers: User[] = [];
 
-      const resource = reactiveHttpResourceWithParams<User[], { status: string }>({
+      const resource = reactiveHttpResourceWithParams<
+        User[],
+        { status: string }
+      >({
         url: '/api/users',
         paramsKey: 'filter',
         params: () => ({

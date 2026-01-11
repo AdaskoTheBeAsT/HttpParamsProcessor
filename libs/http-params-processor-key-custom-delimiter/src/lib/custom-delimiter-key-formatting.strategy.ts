@@ -7,7 +7,7 @@ import { IKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-co
 export class CustomDelimiterKeyFormattingStrategy implements IKeyFormattingStrategy {
   constructor(
     private readonly objectDelimiter: string = ':',
-    private readonly arrayFormat: 'bracket' | 'delimiter' = 'bracket'
+    private readonly arrayFormat: 'bracket' | 'delimiter' = 'bracket',
   ) {}
 
   formatObjectKey(parentKey: string, propertyKey: string): string {

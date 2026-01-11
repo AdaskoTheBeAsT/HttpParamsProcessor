@@ -5,7 +5,10 @@ import { Dayjs } from 'dayjs';
 /**
  * Strategy to normalize Dayjs date objects to native JavaScript Date.
  */
-export class DayjsDateValueFromStrategy implements IValueFromStrategy<Dayjs, Date> {
+export class DayjsDateValueFromStrategy implements IValueFromStrategy<
+  Dayjs,
+  Date
+> {
   normalizeValue(value: Dayjs): Date {
     return value.toDate();
   }

@@ -1,10 +1,10 @@
-import { IKeyFormattingStrategy } from './strategies/key-formatting-strategy.interface';
 import { DefaultKeyFormattingStrategy } from './strategies/default-key-formatting-strategy';
-import { IValueConverter } from './strategies/value-converter.interface';
-import { ValueConverter } from './strategies/value-converter';
 import { DefaultDateValueFromStrategy } from './strategies/defaults/default-date-value-from-strategy';
 import { DefaultDateValueToStrategy } from './strategies/defaults/default-date-value-to-strategy';
 import { DefaultPrimitiveValueToStrategy } from './strategies/defaults/default-primitive-value-to-strategy';
+import { IKeyFormattingStrategy } from './strategies/key-formatting-strategy.interface';
+import { ValueConverter } from './strategies/value-converter';
+import { IValueConverter } from './strategies/value-converter.interface';
 import { IValueFromStrategy } from './strategies/value-from-strategy.interface';
 import { IValueToStrategy } from './strategies/value-to-strategy.interface';
 
@@ -52,9 +52,10 @@ export type ProcessableInput =
 /**
  * Pass-through value-from strategy for primitives (already in target form).
  */
-class PrimitivePassThroughValueFromStrategy
-  implements IValueFromStrategy<Primitive, Primitive>
-{
+class PrimitivePassThroughValueFromStrategy implements IValueFromStrategy<
+  Primitive,
+  Primitive
+> {
   normalizeValue(value: Primitive): Primitive {
     return value;
   }
@@ -90,11 +91,11 @@ export class ParamsProcessor {
     return [
       new ValueConverter(
         new DefaultDateValueFromStrategy(),
-        new DefaultDateValueToStrategy()
+        new DefaultDateValueToStrategy(),
       ),
       new ValueConverter(
         new PrimitivePassThroughValueFromStrategy(),
-        new DefaultPrimitiveValueToStrategy() as IValueToStrategy<Primitive>
+        new DefaultPrimitiveValueToStrategy() as IValueToStrategy<Primitive>,
       ),
     ];
   }
@@ -109,7 +110,7 @@ export class ParamsProcessor {
   process(
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): ParamsEntry[] {
     const entries: ParamsEntry[] = [];
     const visited = new WeakSet<object>();
@@ -120,7 +121,7 @@ export class ParamsProcessor {
       obj,
       visited,
       keyFormatter,
-      valueConverters
+      valueConverters,
     );
     return entries;
   }
@@ -135,7 +136,7 @@ export class ParamsProcessor {
   toQueryString(
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): string {
     const entries = this.process(key, obj, options);
     return entries
@@ -153,7 +154,7 @@ export class ParamsProcessor {
   toURLSearchParams(
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): URLSearchParams {
     const entries = this.process(key, obj, options);
     const params = new URLSearchParams();
@@ -174,7 +175,7 @@ export class ParamsProcessor {
   toPlainObject(
     key: string,
     obj: ProcessableInput,
-    options?: ParamsProcessorOptions
+    options?: ParamsProcessorOptions,
   ): Record<string, string | string[]> {
     const entries = this.process(key, obj, options);
     const result: Record<string, string | string[]> = {};
@@ -218,7 +219,7 @@ export class ParamsProcessor {
     obj: ProcessableInput,
     visited: WeakSet<object>,
     keyFormatter: IKeyFormattingStrategy,
-    valueConverters: IValueConverter[]
+    valueConverters: IValueConverter[],
   ): void {
     if (obj == null) {
       return;
@@ -241,7 +242,7 @@ export class ParamsProcessor {
       const result = keyFormatter.transformComplexObject(
         appender,
         key,
-        obj as Record<string, unknown> | unknown[]
+        obj as Record<string, unknown> | unknown[],
       );
 
       if (result !== null) {
@@ -255,7 +256,14 @@ export class ParamsProcessor {
         throw new Error(`Circular reference detected at key: ${key}`);
       }
       visited.add(obj);
-      this.processArray(entries, key, obj, visited, keyFormatter, valueConverters);
+      this.processArray(
+        entries,
+        key,
+        obj,
+        visited,
+        keyFormatter,
+        valueConverters,
+      );
     } else if (
       typeof obj === 'object' &&
       Object.prototype.toString.call(obj) !== '[object Date]'
@@ -270,7 +278,7 @@ export class ParamsProcessor {
         obj as Record<string, unknown> | null,
         visited,
         keyFormatter,
-        valueConverters
+        valueConverters,
       );
     } else {
       this.addEntry(entries, key, obj, valueConverters);
@@ -281,7 +289,7 @@ export class ParamsProcessor {
     entries: ParamsEntry[],
     key: string,
     elem: unknown,
-    valueConverters: IValueConverter[]
+    valueConverters: IValueConverter[],
   ): void {
     if (elem === undefined || elem === null) {
       return;
@@ -307,7 +315,7 @@ export class ParamsProcessor {
     obj: Record<string, unknown> | null,
     visited: WeakSet<object>,
     keyFormatter: IKeyFormattingStrategy,
-    valueConverters: IValueConverter[]
+    valueConverters: IValueConverter[],
   ): void {
     for (const property in obj) {
       if (!Object.hasOwn(obj as object, property)) {
@@ -324,7 +332,7 @@ export class ParamsProcessor {
         obj[property] as ProcessableInput,
         visited,
         keyFormatter,
-        valueConverters
+        valueConverters,
       );
     }
   }
@@ -335,7 +343,7 @@ export class ParamsProcessor {
     arr: unknown[],
     visited: WeakSet<object>,
     keyFormatter: IKeyFormattingStrategy,
-    valueConverters: IValueConverter[]
+    valueConverters: IValueConverter[],
   ): void {
     let index = 0;
     for (const item of arr) {
@@ -347,7 +355,7 @@ export class ParamsProcessor {
         item as ProcessableInput,
         visited,
         keyFormatter,
-        valueConverters
+        valueConverters,
       );
     }
   }

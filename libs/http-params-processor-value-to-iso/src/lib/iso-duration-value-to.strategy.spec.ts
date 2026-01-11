@@ -52,7 +52,7 @@ describe('IsoDurationValueToStrategy', () => {
         days: 3,
         hours: 4,
         minutes: 5,
-        seconds: 6
+        seconds: 6,
       });
       expect(result).toBe('P1Y2M3DT4H5M6S');
     });

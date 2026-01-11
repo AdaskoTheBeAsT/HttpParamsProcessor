@@ -29,14 +29,14 @@ describe('MsTimestampValueToStrategy', () => {
     it('should convert Date to milliseconds timestamp string', () => {
       const date = new Date('2024-01-01T00:00:00.000Z');
       const result = strategy.serializeValue(date);
-      
+
       expect(result).toBe('1704067200000');
     });
 
     it('should preserve milliseconds', () => {
       const date = new Date('2024-01-01T00:00:00.123Z');
       const result = strategy.serializeValue(date);
-      
+
       expect(result).toBe('1704067200123');
     });
 
@@ -44,7 +44,7 @@ describe('MsTimestampValueToStrategy', () => {
       const date = new Date('2024-06-15T14:30:45.500Z');
       const result = strategy.serializeValue(date);
       const expected = date.getTime().toString();
-      
+
       expect(result).toBe(expected);
     });
   });

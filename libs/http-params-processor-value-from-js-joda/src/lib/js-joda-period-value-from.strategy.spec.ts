@@ -1,4 +1,5 @@
 import { Period } from '@js-joda/core';
+
 import { JsJodaPeriodValueFromStrategy } from './js-joda-period-value-from.strategy';
 
 describe('JsJodaPeriodValueFromStrategy', () => {
@@ -22,21 +23,21 @@ describe('JsJodaPeriodValueFromStrategy', () => {
     it('should convert period of years', () => {
       const period = Period.ofYears(2);
       const result = strategy.normalizeValue(period);
-      
+
       expect(result.years).toBe(2);
     });
 
     it('should convert period of months', () => {
       const period = Period.ofMonths(6);
       const result = strategy.normalizeValue(period);
-      
+
       expect(result.months).toBe(6);
     });
 
     it('should convert complex period', () => {
       const period = Period.of(1, 2, 3);
       const result = strategy.normalizeValue(period);
-      
+
       expect(result.years).toBe(1);
       expect(result.months).toBe(2);
       expect(result.days).toBe(3);

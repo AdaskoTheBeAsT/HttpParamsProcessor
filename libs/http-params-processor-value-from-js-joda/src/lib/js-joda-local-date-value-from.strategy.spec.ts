@@ -1,4 +1,5 @@
 import { LocalDate, LocalDateTime } from '@js-joda/core';
+
 import { JsJodaLocalDateValueFromStrategy } from './js-joda-local-date-value-from.strategy';
 
 describe('JsJodaLocalDateValueFromStrategy', () => {
@@ -14,7 +15,9 @@ describe('JsJodaLocalDateValueFromStrategy', () => {
     });
 
     it('should return true for LocalDateTime', () => {
-      expect(strategy.canHandle(LocalDateTime.of(2024, 1, 15, 10, 30))).toBe(true);
+      expect(strategy.canHandle(LocalDateTime.of(2024, 1, 15, 10, 30))).toBe(
+        true,
+      );
     });
 
     it('should return false for native Date', () => {
@@ -30,7 +33,7 @@ describe('JsJodaLocalDateValueFromStrategy', () => {
     it('should convert LocalDate to Date', () => {
       const jodaDate = LocalDate.of(2024, 1, 15);
       const result = strategy.normalizeValue(jodaDate);
-      
+
       expect(result).toBeInstanceOf(Date);
       expect(result.getFullYear()).toBe(2024);
       expect(result.getMonth()).toBe(0); // January = 0
@@ -40,7 +43,7 @@ describe('JsJodaLocalDateValueFromStrategy', () => {
     it('should convert LocalDateTime to Date', () => {
       const jodaDateTime = LocalDateTime.of(2024, 1, 15, 10, 30, 45);
       const result = strategy.normalizeValue(jodaDateTime);
-      
+
       expect(result).toBeInstanceOf(Date);
       expect(result.getHours()).toBe(10);
       expect(result.getMinutes()).toBe(30);
