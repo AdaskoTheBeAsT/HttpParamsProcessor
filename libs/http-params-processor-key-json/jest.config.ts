@@ -1,14 +1,14 @@
-const reportPath = '.reports/libs/http-params-processor-react-swr/';
+const reportPath = '.reports/libs/http-params-processor-key-json/';
 const reportName = 'test-report';
 
 export default {
-  displayName: 'http-params-processor-swr',
+  displayName: 'http-params-processor-key-json',
   preset: '../../jest.preset.js',
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   transform: {
-    '^.+\\.[tj]sx?$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
+    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
+  moduleFileExtensions: ['ts', 'js', 'html'],
   collectCoverage: true,
   coverageDirectory: `../../${reportPath}coverage`,
   coverageReporters: ['cobertura', 'html', 'lcov'],

@@ -34,7 +34,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/http-params-processor-value-to-nodatime/jest.config.cts",
+        "jestConfig": "libs/http-params-processor-value-to-nodatime/jest.config.ts",
         "tsConfig": "libs/http-params-processor-value-to-nodatime/tsconfig.spec.json"
       }
     },
