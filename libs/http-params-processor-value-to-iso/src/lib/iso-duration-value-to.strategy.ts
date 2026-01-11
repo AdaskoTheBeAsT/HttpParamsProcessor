@@ -21,8 +21,8 @@ export class IsoDurationValueToStrategy implements IValueToStrategy<DurationComp
       return false;
     }
     const obj = value as Record<string, unknown>;
-    const validKeys = ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds'];
-    return Object.keys(obj).some(key => validKeys.includes(key) && typeof obj[key] === 'number');
+    const validKeys = new Set(['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds']);
+    return Object.keys(obj).some(key => validKeys.has(key) && typeof obj[key] === 'number');
   }
 
   private buildDatePart(value: DurationComponents): string {
@@ -38,12 +38,12 @@ export class IsoDurationValueToStrategy implements IValueToStrategy<DurationComp
     let result = '';
     if (value.hours) result += `${value.hours}H`;
     if (value.minutes) result += `${value.minutes}M`;
-    
+
     const seconds = (value.seconds || 0) + (value.milliseconds ? value.milliseconds / 1000 : 0);
     if (seconds) {
       result += `${seconds}S`;
     }
-    
+
     return result;
   }
 }

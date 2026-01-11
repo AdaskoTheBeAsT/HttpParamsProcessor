@@ -1,14 +1,19 @@
-import { IValueFromStrategy, DurationComponents } from '@adaskothebeast/http-params-processor-core';
+import {
+  DurationComponents,
+  IValueFromStrategy,
+} from '@adaskothebeast/http-params-processor-core';
 import dayjs from 'dayjs';
-import durationPlugin from 'dayjs/plugin/duration';
-import { Duration } from 'dayjs/plugin/duration';
+import durationPlugin, { Duration } from 'dayjs/plugin/duration';
 
 dayjs.extend(durationPlugin);
 
 /**
  * Strategy to normalize Dayjs Duration objects to DurationComponents.
  */
-export class DayjsDurationValueFromStrategy implements IValueFromStrategy<Duration, DurationComponents> {
+export class DayjsDurationValueFromStrategy implements IValueFromStrategy<
+  Duration,
+  DurationComponents
+> {
   normalizeValue(value: Duration): DurationComponents {
     return {
       years: value.years() || undefined,

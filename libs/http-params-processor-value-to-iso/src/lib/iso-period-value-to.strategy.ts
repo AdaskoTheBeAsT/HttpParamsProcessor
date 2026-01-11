@@ -7,12 +7,12 @@ import { IValueToStrategy, PeriodComponents } from '@adaskothebeast/http-params-
 export class IsoPeriodValueToStrategy implements IValueToStrategy<PeriodComponents> {
   serializeValue(value: PeriodComponents): string {
     let result = 'P';
-    
+
     if (value.years) result += `${value.years}Y`;
     if (value.months) result += `${value.months}M`;
     if (value.weeks) result += `${value.weeks}W`;
     if (value.days) result += `${value.days}D`;
-    
+
     return result === 'P' ? 'P0D' : result;
   }
 
@@ -21,12 +21,12 @@ export class IsoPeriodValueToStrategy implements IValueToStrategy<PeriodComponen
       return false;
     }
     const obj = value as Record<string, unknown>;
-    const validKeys = ['years', 'months', 'weeks', 'days'];
-    const hasOnlyPeriodKeys = Object.keys(obj).every(key => 
-      validKeys.includes(key) || obj[key] === undefined
+    const validKeys = new Set(['years', 'months', 'weeks', 'days']);
+    const hasOnlyPeriodKeys = Object.keys(obj).every(key =>
+      validKeys.has(key) || obj[key] === undefined
     );
-    return hasOnlyPeriodKeys && Object.keys(obj).some(key => 
-      validKeys.includes(key) && typeof obj[key] === 'number'
+    return hasOnlyPeriodKeys && Object.keys(obj).some(key =>
+      validKeys.has(key) && typeof obj[key] === 'number'
     );
   }
 }

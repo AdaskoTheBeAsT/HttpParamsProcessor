@@ -1,4 +1,7 @@
-import { IValueToStrategy, DurationComponents } from '@adaskothebeast/http-params-processor-core';
+import {
+  DurationComponents,
+  IValueToStrategy,
+} from '@adaskothebeast/http-params-processor-core';
 
 /**
  * Strategy to serialize DurationComponents to NodaTime Duration format.
@@ -10,7 +13,9 @@ export class NodaTimeDurationValueToStrategy implements IValueToStrategy<Duratio
     // Convert all to a consistent time-based representation
     let totalHours = (value.hours || 0) + (value.days || 0) * 24;
     const minutes = value.minutes || 0;
-    const seconds = (value.seconds || 0) + (value.milliseconds ? value.milliseconds / 1000 : 0);
+    const seconds =
+      (value.seconds || 0) +
+      (value.milliseconds ? value.milliseconds / 1000 : 0);
 
     if (totalHours === 0 && minutes === 0 && seconds === 0) {
       return 'PT0S';
@@ -20,7 +25,7 @@ export class NodaTimeDurationValueToStrategy implements IValueToStrategy<Duratio
     if (totalHours) result += `${totalHours}H`;
     if (minutes) result += `${minutes}M`;
     if (seconds) result += `${seconds}S`;
-    
+
     return result;
   }
 
@@ -29,7 +34,15 @@ export class NodaTimeDurationValueToStrategy implements IValueToStrategy<Duratio
       return false;
     }
     const obj = value as Record<string, unknown>;
-    const timeKeys = ['days', 'hours', 'minutes', 'seconds', 'milliseconds'];
-    return Object.keys(obj).some(key => timeKeys.includes(key) && typeof obj[key] === 'number');
+    const timeKeys = new Set([
+      'days',
+      'hours',
+      'minutes',
+      'seconds',
+      'milliseconds',
+    ]);
+    return Object.keys(obj).some(
+      (key) => timeKeys.has(key) && typeof obj[key] === 'number',
+    );
   }
 }
