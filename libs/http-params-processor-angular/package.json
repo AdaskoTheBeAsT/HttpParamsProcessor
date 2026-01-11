@@ -20,7 +20,6 @@
   },
   "peerDependencies": {
     "@angular/common": "^21.0.0",
-    "@angular/core": "^21.0.0",
     "@adaskothebeast/http-params-processor-core": "^11.0.0"
   },
   "sideEffects": false
