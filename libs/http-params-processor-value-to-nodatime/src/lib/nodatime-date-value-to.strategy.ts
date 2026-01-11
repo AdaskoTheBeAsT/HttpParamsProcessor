@@ -10,6 +10,6 @@ export class NodaTimeDateValueToStrategy implements IValueToStrategy<Date> {
   }
 
   canHandle(value: unknown): value is Date {
-    return value instanceof Date && !isNaN(value.getTime());
+    return value instanceof Date && !Number.isNaN(value.getTime());
   }
 }
