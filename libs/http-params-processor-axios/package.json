@@ -1,6 +1,6 @@
 {
   "name": "@adaskothebeast/http-params-processor-axios",
-  "version": "11.0.0",
+  "version": "11.1.0",
   "license": "MIT",
   "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
   "repository": {
@@ -28,6 +28,6 @@
     "!**/*.tsbuildinfo"
   ],
   "peerDependencies": {
-    "@adaskothebeast/http-params-processor-core": "^11.0.0"
+    "@adaskothebeast/http-params-processor-core": "^11.1.0"
   }
 }
