@@ -4,6 +4,7 @@
   "sourceRoot": "libs/http-params-processor-angular-resource/src",
   "prefix": "lib",
   "projectType": "library",
+  "implicitDependencies": ["@adaskothebeast/http-params-processor-angular"],
   "release": {
     "version": {
       "manifestRootsToUpdate": ["dist/{projectRoot}"],
