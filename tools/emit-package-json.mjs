@@ -50,6 +50,11 @@ const relTypes = relFromDist(typesFile) ?? './index.d.ts';
 const distPkg = {
   name: sourcePkg.name,
   version: sourcePkg.version ?? '0.0.0',
+  license: sourcePkg.license,
+  author: sourcePkg.author,
+  repository: sourcePkg.repository,
+  bugs: sourcePkg.bugs,
+  homepage: sourcePkg.homepage,
   type: 'module',
   main: relCjs,
   module: relEsm,
