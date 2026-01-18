@@ -1,6 +1,16 @@
 {
   "name": "@adaskothebeast/http-params-processor-value-from-dayjs",
   "version": "11.0.0",
+  "license": "MIT",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
