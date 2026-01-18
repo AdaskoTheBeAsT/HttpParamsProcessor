@@ -1,8 +1,8 @@
 {
-  "name": "http-params-processor-angular-resource",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "@adaskothebeast/http-params-processor-angular-resource",
   "sourceRoot": "libs/http-params-processor-angular-resource/src",
-  "prefix": "adaskothebeast",
+  "prefix": "lib",
   "projectType": "library",
   "release": {
     "version": {
@@ -11,11 +11,9 @@
       "fallbackCurrentVersionResolver": "disk"
     }
   },
-  "tags": ["scope:angular", "type:lib"],
-  "implicitDependencies": ["http-params-processor-angular"],
+  "tags": [],
   "targets": {
     "build": {
-      "dependsOn": ["^build"],
       "executor": "@nx/angular:package",
       "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
       "options": {
@@ -36,11 +34,10 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "executor": "@nx/angular:unit-test",
       "options": {
-        "jestConfig": "libs/http-params-processor-angular-resource/jest.config.cts",
-        "tsConfig": "libs/http-params-processor-angular-resource/tsconfig.spec.json"
+        "runnerConfig": "libs/http-params-processor-angular-resource/vitest.config.mts",
+        "coverage": true
       }
     },
     "lint": {

@@ -1,39 +1,23 @@
 {
   "name": "@adaskothebeast/http-params-processor-fetch",
   "version": "11.0.0",
-  "description": "Fetch API adapter for params-processor - serialize complex objects to URLSearchParams",
-  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
-  "license": "MIT",
-  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
-  "keywords": [
-    "fetch",
-    "params",
-    "query",
-    "url",
-    "URLSearchParams",
-    "http",
-    "serialization",
-    "typescript"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
-  },
-  "bugs": {
-    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
-  },
-  "main": "./src/index.js",
-  "module": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js",
-      "require": "./src/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
   "peerDependencies": {
     "@adaskothebeast/http-params-processor-core": "^11.0.0"
-  },
-  "sideEffects": false
+  }
 }

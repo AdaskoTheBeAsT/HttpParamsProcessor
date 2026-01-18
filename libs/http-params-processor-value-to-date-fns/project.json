@@ -1,45 +1,41 @@
 {
-  "name": "http-params-processor-value-to-date-fns",
+  "name": "@adaskothebeast/http-params-processor-value-to-date-fns",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/http-params-processor-value-to-date-fns/src",
   "projectType": "library",
-  "release": {
-    "version": {
-      "manifestRootsToUpdate": ["dist/{projectRoot}"],
-      "currentVersionResolver": "git-tag",
-      "fallbackCurrentVersionResolver": "disk"
-    }
-  },
   "tags": [],
   "targets": {
-    "build": {
-      "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+    "bundle": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/libs/http-params-processor-value-to-date-fns",
+        "outputPath": "{workspaceRoot}/dist/libs/http-params-processor-value-to-date-fns",
         "main": "libs/http-params-processor-value-to-date-fns/src/index.ts",
         "tsConfig": "libs/http-params-processor-value-to-date-fns/tsconfig.lib.json",
-        "assets": [
-          "libs/http-params-processor-value-to-date-fns/LICENSE",
-          "libs/http-params-processor-value-to-date-fns/README.md"
+        "format": [
+          "esm",
+          "cjs"
+        ],
+        "declaration": false,
+        "external": ["@adaskothebeast/*"],
+        "skipTypeCheck": true
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "commands": [
+          "nx run http-params-processor-value-to-date-fns:bundle",
+          "tsc -p libs/http-params-processor-value-to-date-fns/tsconfig.lib.json",
+          "node tools/emit-package-json.mjs libs/http-params-processor-value-to-date-fns"
         ]
-      }
-    },
-    "nx-release-publish": {
-      "options": {
-        "packageRoot": "dist/{projectRoot}"
-      }
-    },
-    "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "libs/http-params-processor-value-to-date-fns/jest.config.ts",
-        "tsConfig": "libs/http-params-processor-value-to-date-fns/tsconfig.spec.json"
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
+      },
+      "outputs": [
+        "{workspaceRoot}/dist/libs/http-params-processor-value-to-date-fns"
+      ]
     }
   }
 }

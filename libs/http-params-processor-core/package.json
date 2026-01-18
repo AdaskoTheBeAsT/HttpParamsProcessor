@@ -1,36 +1,20 @@
 {
   "name": "@adaskothebeast/http-params-processor-core",
   "version": "11.0.0",
-  "description": "Framework-agnostic params processor for converting complex objects to query parameters",
-  "author": "Adam Pluciński <adaskothebeast@gmail.com>",
-  "license": "MIT",
-  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
-  "keywords": [
-    "params",
-    "query",
-    "url",
-    "http",
-    "serialization",
-    "axios",
-    "fetch",
-    "typescript"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
-  },
-  "bugs": {
-    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
-  },
-  "main": "./src/index.js",
-  "module": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
+    "./package.json": "./package.json",
     ".": {
-      "types": "./src/index.d.ts",
-      "import": "./src/index.js",
-      "require": "./src/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
-  "sideEffects": false
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ]
 }

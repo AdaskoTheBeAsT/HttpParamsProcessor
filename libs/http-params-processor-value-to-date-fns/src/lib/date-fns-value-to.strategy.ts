@@ -5,7 +5,7 @@ import { format } from 'date-fns';
  * Strategy to serialize Date objects using date-fns format strings.
  */
 export class DateFnsValueToStrategy implements IValueToStrategy<Date> {
-  constructor(private readonly formatString: string = 'yyyy-MM-dd') {}
+  constructor(private readonly formatString = 'yyyy-MM-dd') {}
 
   serializeValue(value: Date): string {
     return format(value, this.formatString);

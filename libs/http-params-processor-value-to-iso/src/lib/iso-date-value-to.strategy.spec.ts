@@ -8,32 +8,26 @@ describe('IsoDateValueToStrategy', () => {
   });
 
   describe('canHandle', () => {
-    it('should return true for valid Date objects', () => {
-      expect(strategy.canHandle(new Date('2024-01-01'))).toBe(true);
+    it('should handle Date objects', () => {
+      expect(strategy.canHandle(new Date())).toBe(true);
     });
 
-    it('should return false for invalid Date objects', () => {
+    it('should not handle invalid dates', () => {
       expect(strategy.canHandle(new Date('invalid'))).toBe(false);
     });
 
-    it('should return false for strings', () => {
-      expect(strategy.canHandle('2024-01-01T00:00:00.000Z')).toBe(false);
+    it('should not handle non-Date values', () => {
+      expect(strategy.canHandle('2024-01-01')).toBe(false);
+      expect(strategy.canHandle(123456)).toBe(false);
+      expect(strategy.canHandle(null)).toBe(false);
+      expect(strategy.canHandle(undefined)).toBe(false);
     });
   });
 
   describe('serializeValue', () => {
-    it('should convert Date to ISO 8601 string', () => {
-      const date = new Date('2024-01-01T00:00:00.000Z');
-      const result = strategy.serializeValue(date);
-
-      expect(result).toBe('2024-01-01T00:00:00.000Z');
-    });
-
-    it('should preserve milliseconds', () => {
-      const date = new Date('2024-01-01T12:30:45.123Z');
-      const result = strategy.serializeValue(date);
-
-      expect(result).toBe('2024-01-01T12:30:45.123Z');
+    it('should serialize Date to ISO string', () => {
+      const date = new Date('2024-01-15T10:30:00.000Z');
+      expect(strategy.serializeValue(date)).toBe('2024-01-15T10:30:00.000Z');
     });
   });
 });

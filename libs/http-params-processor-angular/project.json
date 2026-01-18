@@ -1,8 +1,8 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "name": "http-params-processor-angular",
+  "name": "@adaskothebeast/http-params-processor-angular",
   "sourceRoot": "libs/http-params-processor-angular/src",
-  "prefix": "adaskothebeast",
+  "prefix": "lib",
   "projectType": "library",
   "release": {
     "version": {
@@ -34,11 +34,10 @@
       }
     },
     "test": {
-      "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "executor": "@nx/angular:unit-test",
       "options": {
-        "jestConfig": "libs/http-params-processor-angular/jest.config.cts",
-        "tsConfig": "libs/http-params-processor-angular/tsconfig.spec.json"
+        "runnerConfig": "libs/http-params-processor-angular/vitest.config.mts",
+        "coverage": true
       }
     },
     "lint": {

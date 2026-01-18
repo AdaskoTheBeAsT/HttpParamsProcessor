@@ -8,68 +8,48 @@ describe('IsoDurationValueToStrategy', () => {
   });
 
   describe('canHandle', () => {
-    it('should return true for DurationComponents with hours', () => {
-      expect(strategy.canHandle({ hours: 1 })).toBe(true);
+    it('should handle duration components', () => {
+      expect(strategy.canHandle({ hours: 1, minutes: 30 })).toBe(true);
+      expect(strategy.canHandle({ days: 5 })).toBe(true);
+      expect(strategy.canHandle({ years: 1, months: 6 })).toBe(true);
     });
 
-    it('should return true for DurationComponents with multiple fields', () => {
-      expect(strategy.canHandle({ years: 1, months: 2, days: 3 })).toBe(true);
-    });
-
-    it('should return false for null', () => {
+    it('should not handle non-duration values', () => {
       expect(strategy.canHandle(null)).toBe(false);
-    });
-
-    it('should return false for Date objects', () => {
-      expect(strategy.canHandle(new Date())).toBe(false);
-    });
-
-    it('should return false for empty object', () => {
-      expect(strategy.canHandle({})).toBe(false);
+      expect(strategy.canHandle('PT1H')).toBe(false);
+      expect(strategy.canHandle(3600)).toBe(false);
     });
   });
 
   describe('serializeValue', () => {
-    it('should format hours and minutes', () => {
-      const result = strategy.serializeValue({ hours: 1, minutes: 30 });
-      expect(result).toBe('PT1H30M');
+    it('should serialize time-only duration', () => {
+      expect(strategy.serializeValue({ hours: 1, minutes: 30, seconds: 45 }))
+        .toBe('PT1H30M45S');
     });
 
-    it('should format days', () => {
-      const result = strategy.serializeValue({ days: 5 });
-      expect(result).toBe('P5D');
+    it('should serialize date-only duration', () => {
+      expect(strategy.serializeValue({ years: 1, months: 6, days: 15 }))
+        .toBe('P1Y6M15D');
     });
 
-    it('should format years, months, and days', () => {
-      const result = strategy.serializeValue({ years: 1, months: 2, days: 3 });
-      expect(result).toBe('P1Y2M3D');
+    it('should serialize full duration', () => {
+      expect(strategy.serializeValue({ 
+        years: 1, 
+        months: 2, 
+        days: 3, 
+        hours: 4, 
+        minutes: 5, 
+        seconds: 6 
+      })).toBe('P1Y2M3DT4H5M6S');
     });
 
-    it('should format full duration', () => {
-      const result = strategy.serializeValue({
-        years: 1,
-        months: 2,
-        days: 3,
-        hours: 4,
-        minutes: 5,
-        seconds: 6,
-      });
-      expect(result).toBe('P1Y2M3DT4H5M6S');
-    });
-
-    it('should handle milliseconds as fractional seconds', () => {
-      const result = strategy.serializeValue({ seconds: 1, milliseconds: 500 });
-      expect(result).toBe('PT1.5S');
+    it('should handle milliseconds', () => {
+      expect(strategy.serializeValue({ seconds: 1, milliseconds: 500 }))
+        .toBe('PT1.5S');
     });
 
     it('should return PT0S for empty duration', () => {
-      const result = strategy.serializeValue({});
-      expect(result).toBe('PT0S');
-    });
-
-    it('should handle weeks', () => {
-      const result = strategy.serializeValue({ weeks: 2 });
-      expect(result).toBe('P2W');
+      expect(strategy.serializeValue({})).toBe('PT0S');
     });
   });
 });

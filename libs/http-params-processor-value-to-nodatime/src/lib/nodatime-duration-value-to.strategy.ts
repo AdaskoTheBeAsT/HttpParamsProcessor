@@ -11,7 +11,7 @@ export class NodaTimeDurationValueToStrategy implements IValueToStrategy<Duratio
   serializeValue(value: DurationComponents): string {
     // NodaTime Duration only supports time components (no years/months)
     // Convert all to a consistent time-based representation
-    let totalHours = (value.hours || 0) + (value.days || 0) * 24;
+    const totalHours = (value.hours || 0) + (value.days || 0) * 24;
     const minutes = value.minutes || 0;
     const seconds =
       (value.seconds || 0) +

@@ -1,12 +1,12 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # compiled output
-/dist
-/tmp
-/out-tsc
+dist
+tmp
+out-tsc
 
 # dependencies
-/node_modules
+node_modules
 
 # IDEs and editors
 /.idea
@@ -25,7 +25,6 @@
 !.vscode/extensions.json
 
 # misc
-/.angular/cache
 /.sass-cache
 /connect.lock
 /coverage
@@ -39,11 +38,12 @@ testem.log
 .DS_Store
 Thumbs.db
 
-/.reports
-
 .nx/cache
 .nx/workspace-data
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
 
+vitest.config.*.timestamp*
+
+/.reports
 .angular
+
+__screenshots__/

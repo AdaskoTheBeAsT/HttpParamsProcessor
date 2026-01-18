@@ -3,6 +3,5 @@
   "dest": "../../dist/libs/http-params-processor-angular",
   "lib": {
     "entryFile": "src/index.ts"
-  },
-  "assets": ["./LICENSE", "./README.md"]
+  }
 }

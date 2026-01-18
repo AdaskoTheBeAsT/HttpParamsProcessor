@@ -1,6 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "baseUrl": "../..",
+    "composite": true,
     "outDir": "../../dist/out-tsc",
     "declaration": true,
     "declarationMap": true,
@@ -8,11 +10,8 @@
     "types": []
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
-    "jest.config.ts",
-    "jest.config.cts",
-    "src/test-setup.ts"
-  ]
+  "references": [
+    { "path": "../http-params-processor-core/tsconfig.lib.json" }
+  ],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"]
 }

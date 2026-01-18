@@ -45,7 +45,7 @@ describe('JsonKeyFormattingStrategy', () => {
       const result = strategy.transformComplexObject(params, 'filter', obj);
 
       expect(result).not.toBeNull();
-      expect(result!.get('filter')).toBe('{"status":"active","count":5}');
+      expect(result?.get('filter')).toBe('{"status":"active","count":5}');
     });
 
     it('should serialize array as JSON string', () => {
@@ -55,7 +55,7 @@ describe('JsonKeyFormattingStrategy', () => {
       const result = strategy.transformComplexObject(params, 'tags', arr);
 
       expect(result).not.toBeNull();
-      expect(result!.get('tags')).toBe('["a","b","c"]');
+      expect(result?.get('tags')).toBe('["a","b","c"]');
     });
 
     it('should serialize nested objects as JSON string', () => {
@@ -68,7 +68,7 @@ describe('JsonKeyFormattingStrategy', () => {
       const result = strategy.transformComplexObject(params, 'data', obj);
 
       expect(result).not.toBeNull();
-      expect(result!.get('data')).toBe(
+      expect(result?.get('data')).toBe(
         '{"user":{"name":"John","age":30},"active":true}',
       );
     });

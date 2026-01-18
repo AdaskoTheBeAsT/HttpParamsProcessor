@@ -1,82 +1,86 @@
 {
-  "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
+    "composite": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
     "importHelpers": true,
-    "target": "es2015",
-    "module": "esnext",
-    "lib": ["es2022", "dom"],
+    "isolatedModules": true,
+    "lib": ["es2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
+    "strict": true,
+    "target": "es2022",
+    "customConditions": ["@adaskothebeast/http-params-processor"],
     "paths": {
       "@adaskothebeast/http-params-processor-core": [
-        "libs/http-params-processor-core/src/index.ts"
+        "./libs/http-params-processor-core/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-angular": [
-        "libs/http-params-processor-angular/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-axios": [
-        "libs/http-params-processor-axios/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-fetch": [
-        "libs/http-params-processor-fetch/src/index.ts"
+        "./libs/http-params-processor-angular/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-angular-resource": [
-        "libs/http-params-processor-angular-resource/src/index.ts"
+        "./libs/http-params-processor-angular-resource/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-axios": [
+        "./libs/http-params-processor-axios/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-fetch": [
+        "./libs/http-params-processor-fetch/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-key-bracket-notation": [
-        "libs/http-params-processor-key-bracket-notation/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-key-flat": [
-        "libs/http-params-processor-key-flat/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-key-json": [
-        "libs/http-params-processor-key-json/src/index.ts"
+        "./libs/http-params-processor-key-bracket-notation/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-key-custom-delimiter": [
-        "libs/http-params-processor-key-custom-delimiter/src/index.ts"
+        "./libs/http-params-processor-key-custom-delimiter/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-key-flat": [
+        "./libs/http-params-processor-key-flat/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-key-json": [
+        "./libs/http-params-processor-key-json/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-key-rails": [
-        "libs/http-params-processor-key-rails/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-from-dayjs": [
-        "libs/http-params-processor-value-from-dayjs/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-from-moment": [
-        "libs/http-params-processor-value-from-moment/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-from-luxon": [
-        "libs/http-params-processor-value-from-luxon/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-from-js-joda": [
-        "libs/http-params-processor-value-from-js-joda/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-to-date-fns": [
-        "libs/http-params-processor-value-to-date-fns/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-to-unix-timestamp": [
-        "libs/http-params-processor-value-to-unix-timestamp/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-to-ms-timestamp": [
-        "libs/http-params-processor-value-to-ms-timestamp/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-to-iso": [
-        "libs/http-params-processor-value-to-iso/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-value-to-nodatime": [
-        "libs/http-params-processor-value-to-nodatime/src/index.ts"
-      ],
-      "@adaskothebeast/http-params-processor-react-tanstack-query": [
-        "libs/http-params-processor-react-tanstack-query/src/index.ts"
+        "./libs/http-params-processor-key-rails/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-react-swr": [
-        "libs/http-params-processor-react-swr/src/index.ts"
+        "./libs/http-params-processor-react-swr/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-react-tanstack-query": [
+        "./libs/http-params-processor-react-tanstack-query/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-from-dayjs": [
+        "./libs/http-params-processor-value-from-dayjs/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-from-js-joda": [
+        "./libs/http-params-processor-value-from-js-joda/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-from-luxon": [
+        "./libs/http-params-processor-value-from-luxon/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-from-moment": [
+        "./libs/http-params-processor-value-from-moment/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-to-date-fns": [
+        "./libs/http-params-processor-value-to-date-fns/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-to-iso": [
+        "./libs/http-params-processor-value-to-iso/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-to-ms-timestamp": [
+        "./libs/http-params-processor-value-to-ms-timestamp/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-to-nodatime": [
+        "./libs/http-params-processor-value-to-nodatime/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-to-unix-timestamp": [
+        "./libs/http-params-processor-value-to-unix-timestamp/src/index.ts"
       ]
     }
-  },
-  "exclude": ["node_modules", "tmp"]
+  }
 }

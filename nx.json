@@ -1,164 +1,78 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {
-    "build": {
-      "dependsOn": ["^build"],
-      "inputs": ["production", "^production"],
-      "cache": true
-    },
-    "@nx/jest:jest": {
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"],
-      "cache": true,
+  "defaultBase": "master",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.mjs",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json"
+    ],
+    "sharedGlobals": []
+  },
+  "plugins": [
+    {
+      "plugin": "@nx/js/typescript",
       "options": {
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
+        "typecheck": {
+          "targetName": "typecheck"
+        },
+        "build": {
+          "targetName": "build",
+          "configName": "tsconfig.lib.json",
+          "buildDepsName": "build-deps",
+          "watchDepsName": "watch-deps"
         }
       }
     },
-    "@nx/eslint:lint": {
-      "inputs": [
-        "default",
-        "{workspaceRoot}/.eslintrc.json",
-        "{workspaceRoot}/.eslintignore"
-      ],
-      "cache": true
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test",
+        "ciTargetName": "test-ci",
+        "testMode": "watch"
+      }
+    }
+  ],
+  "targetDefaults": {
+    "@nx/esbuild:esbuild": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
     },
     "@nx/angular:package": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
+    },
+    "@nx/angular:unit-test": {
+      "cache": true,
+      "inputs": ["default", "^production"]
     }
   },
-  "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "production": [
-      "default",
-      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
-      "!{projectRoot}/tsconfig.spec.json",
-      "!{projectRoot}/jest.config.[jt]s",
-      "!{projectRoot}/src/test-setup.[jt]s",
-      "!{projectRoot}/test-setup.[jt]s",
-      "!{projectRoot}/.eslintrc.json"
-    ],
-    "sharedGlobals": []
+  "release": {
+    "version": {
+      "preVersionCommand": "yarn dlx nx run-many -t build"
+    }
   },
   "generators": {
-    "@nx/angular:application": {
-      "style": "css",
-      "linter": "eslint",
-      "unitTestRunner": "jest",
-      "e2eTestRunner": "none"
-    },
     "@nx/angular:library": {
       "linter": "eslint",
-      "unitTestRunner": "jest"
+      "unitTestRunner": "vitest-angular"
     },
     "@nx/angular:component": {
-      "style": "css",
-      "type": "component"
-    },
-    "@schematics/angular:component": {
-      "type": "component"
-    },
-    "@nx/angular:directive": {
-      "type": "directive"
-    },
-    "@schematics/angular:directive": {
-      "type": "directive"
-    },
-    "@nx/angular:service": {
-      "type": "service"
-    },
-    "@schematics/angular:service": {
-      "type": "service"
-    },
-    "@nx/angular:scam": {
-      "type": "component"
-    },
-    "@nx/angular:scam-directive": {
-      "type": "directive"
-    },
-    "@nx/angular:guard": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:guard": {
-      "typeSeparator": "."
-    },
-    "@nx/angular:interceptor": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:interceptor": {
-      "typeSeparator": "."
-    },
-    "@nx/angular:module": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:module": {
-      "typeSeparator": "."
-    },
-    "@nx/angular:pipe": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:pipe": {
-      "typeSeparator": "."
-    },
-    "@nx/angular:resolver": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:resolver": {
-      "typeSeparator": "."
-    }
-  },
-  "parallel": 1,
-  "defaultBase": "master",
-  "release": {
-    "projects": [
-      "http-params-processor-core",
-      "http-params-processor-angular",
-      "http-params-processor-angular-resource",
-      "http-params-processor-axios",
-      "http-params-processor-fetch",
-      "http-params-processor-react-tanstack-query",
-      "http-params-processor-react-swr",
-      "http-params-processor-key-bracket-notation",
-      "http-params-processor-key-flat",
-      "http-params-processor-key-json",
-      "http-params-processor-key-custom-delimiter",
-      "http-params-processor-key-rails",
-      "http-params-processor-value-from-dayjs",
-      "http-params-processor-value-from-moment",
-      "http-params-processor-value-from-luxon",
-      "http-params-processor-value-from-js-joda",
-      "http-params-processor-value-to-date-fns",
-      "http-params-processor-value-to-unix-timestamp",
-      "http-params-processor-value-to-ms-timestamp",
-      "http-params-processor-value-to-iso",
-      "http-params-processor-value-to-nodatime"
-    ],
-    "projectsRelationship": "fixed",
-    "releaseTagPattern": "v{version}",
-    "version": {
-      "preVersionCommand": "npx nx run-many -t build --all",
-      "conventionalCommits": true,
-      "generatorOptions": {
-        "fallbackCurrentVersionResolver": "disk"
-      }
-    },
-    "changelog": {
-      "projectChangelogs": false,
-      "workspaceChangelog": {
-        "createRelease": "github",
-        "file": "CHANGELOG.md"
-      }
-    },
-    "git": {
-      "commit": true,
-      "tag": true,
-      "commitMessage": "chore(release): publish {version}"
+      "style": "css"
     }
   }
 }
