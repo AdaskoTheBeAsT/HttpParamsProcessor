@@ -3,7 +3,7 @@ name: Publish to npm
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   build:
@@ -17,11 +17,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-
-      - name: Setup Yarn
-        run: |
-          npm install -g yarn
+          node-version: "24"
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn install --immutable
@@ -61,14 +58,18 @@ jobs:
           - http-params-processor-react-swr
           - http-params-processor-react-tanstack-query
           - http-params-processor-value-from-dayjs
+          - http-params-processor-value-from-decimal
           - http-params-processor-value-from-js-joda
           - http-params-processor-value-from-luxon
           - http-params-processor-value-from-moment
+          - http-params-processor-value-from-uuid
           - http-params-processor-value-to-date-fns
+          - http-params-processor-value-to-decimal
           - http-params-processor-value-to-iso
           - http-params-processor-value-to-ms-timestamp
           - http-params-processor-value-to-nodatime
           - http-params-processor-value-to-unix-timestamp
+          - http-params-processor-value-to-uuid
 
     steps:
       - name: Download dist artifacts
@@ -80,11 +81,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Publish ${{ matrix.package }}
         run: npm publish --provenance --access public
         working-directory: dist/libs/${{ matrix.package }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

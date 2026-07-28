@@ -1,4 +1,20 @@
 import { ParamsProcessor, createParamsProcessor } from './params-processor';
+import { ValueConverter } from './strategies/value-converter';
+
+class Money {
+  constructor(public readonly amount: string) {}
+}
+
+const moneyConverter = new ValueConverter<Money, string>(
+  {
+    normalizeValue: (value) => value.amount,
+    canHandle: (value): value is Money => value instanceof Money,
+  },
+  {
+    serializeValue: (value) => value,
+    canHandle: (value): value is string => typeof value === 'string',
+  },
+);
 
 describe('ParamsProcessor', () => {
   let processor: ParamsProcessor;
@@ -119,6 +135,54 @@ describe('ParamsProcessor', () => {
       });
 
       expect(result).toEqual([['filter.name', 'test']]);
+    });
+
+    it('should convert class instances before traversing them', () => {
+      const result = processor.process(
+        'filter',
+        { price: new Money('12.50') },
+        { valueConverters: [moneyConverter] },
+      );
+
+      expect(result).toEqual([['filter.price', '12.50']]);
+    });
+
+    it('should convert class instances inside arrays', () => {
+      const result = processor.process('prices', [new Money('1'), new Money('2')], {
+        valueConverters: [moneyConverter],
+      });
+
+      expect(result).toEqual([
+        ['prices[0]', '1'],
+        ['prices[1]', '2'],
+      ]);
+    });
+
+    it('should still traverse class instances without a converter', () => {
+      const result = processor.process('filter', { price: new Money('12.50') });
+
+      expect(result).toEqual([['filter.price.amount', '12.50']]);
+    });
+
+    it('should still traverse plain objects when a converter claims objects', () => {
+      const objectConverter = new ValueConverter<object, string>(
+        {
+          normalizeValue: () => 'claimed',
+          canHandle: (value): value is object => typeof value === 'object',
+        },
+        {
+          serializeValue: (value) => value,
+          canHandle: (value): value is string => typeof value === 'string',
+        },
+      );
+
+      const result = processor.process(
+        'filter',
+        { user: { name: 'John' } },
+        { valueConverters: [objectConverter] },
+      );
+
+      expect(result).toEqual([['filter.user.name', 'John']]);
     });
   });
 

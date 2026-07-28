@@ -6,5 +6,8 @@
     {
       "path": "./libs/http-params-processor-core"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0"
+  }
 }

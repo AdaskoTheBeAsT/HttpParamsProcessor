@@ -1,0 +1,50 @@
+{
+  "name": "@adaskothebeast/http-params-processor-value-to-uuid",
+  "version": "12.0.0",
+  "description": "Canonical, no dash, braced, urn and base64 UUID output strategies for HttpParamsProcessor.",
+  "keywords": [
+    "http",
+    "http-params",
+    "query-string",
+    "query-params",
+    "querystring",
+    "nested-objects",
+    "serializer",
+    "typescript",
+    "value-conversion",
+    "uuid",
+    "guid",
+    "base64",
+    "urn"
+  ],
+  "license": "MIT",
+  "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
+  },
+  "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo"
+  ],
+  "peerDependencies": {
+    "@adaskothebeast/http-params-processor-core": "^12.0.0"
+  }
+}

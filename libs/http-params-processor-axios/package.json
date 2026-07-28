@@ -1,6 +1,20 @@
 {
   "name": "@adaskothebeast/http-params-processor-axios",
-  "version": "11.1.0",
+  "version": "12.0.0",
+  "description": "Axios paramsSerializer that turns deeply nested objects and arrays into model bindable query parameters.",
+  "keywords": [
+    "http",
+    "http-params",
+    "query-string",
+    "query-params",
+    "querystring",
+    "nested-objects",
+    "serializer",
+    "typescript",
+    "axios",
+    "params-serializer",
+    "interceptor"
+  ],
   "license": "MIT",
   "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
   "repository": {
@@ -12,6 +26,7 @@
   },
   "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,6 +43,6 @@
     "!**/*.tsbuildinfo"
   ],
   "peerDependencies": {
-    "@adaskothebeast/http-params-processor-core": "^11.1.0"
+    "@adaskothebeast/http-params-processor-core": "^12.0.0"
   }
 }

@@ -70,6 +70,18 @@ class PrimitivePassThroughValueFromStrategy implements IValueFromStrategy<
 }
 
 /**
+ * Values that are neither arrays nor object literals are candidates for direct
+ * conversion instead of recursive traversal.
+ */
+export function isPlainObjectOrArray(value: object): boolean {
+  if (Array.isArray(value)) {
+    return true;
+  }
+  const proto: unknown = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+/**
  * Framework-agnostic params processor.
  * Converts complex nested objects into query parameter key-value pairs.
  */
@@ -223,6 +235,16 @@ export class ParamsProcessor {
   ): void {
     if (obj == null) {
       return;
+    }
+
+    // Non-plain objects (Date, Decimal, Uint8Array, ...) are offered to the
+    // converters before traversal, otherwise they would be walked as objects.
+    if (typeof obj === 'object' && !isPlainObjectOrArray(obj)) {
+      const converter = valueConverters.find((c) => c.canHandle(obj));
+      if (converter) {
+        entries.push([key, converter.convert(obj)]);
+        return;
+      }
     }
 
     // Check if key formatter wants to handle complex object directly

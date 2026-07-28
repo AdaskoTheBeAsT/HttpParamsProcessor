@@ -7,6 +7,11 @@ const reportPath = `../../.reports/${project}/`;
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/libs/http-params-processor-key-rails',
+  resolve: {
+    alias: {
+      '@adaskothebeast/http-params-processor-core': path.resolve(__dirname, '../http-params-processor-core/src/index.ts'),
+    },
+  },
   test: {
     name: '@adaskothebeast/http-params-processor-key-rails',
     watch: false,

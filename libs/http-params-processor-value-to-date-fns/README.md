@@ -1,109 +1,133 @@
-# Adaskothebeast
+# 🗓️ @adaskothebeast/http-params-processor-value-to-date-fns
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**Custom date formatting for [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor) powered by [date-fns](https://date-fns.org/): any format token string you like, `yyyy-MM-dd` by default.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-value-to-date-fns?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-date-fns)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+Peer dependencies: `date-fns ^4.4.0` plus `core`. Types ship with `date-fns`. ESM + CJS. `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-value-to-date-fns @adaskothebeast/http-params-processor-core date-fns
 ```
 
-## Run tasks
+---
 
-To build the library use:
+## 🎯 What it does
 
-```sh
-npx nx build pkg1
+This is a **value-to** strategy: the second half of the conversion pipeline. Pair it with a **value-from** strategy (`-value-from-luxon`, `-value-from-dayjs`, `-value-from-moment`, `-value-from-js-joda`, or the `DefaultDateValueFromStrategy` from `core`) using `createValueConverter`.
+
+| Class                    | Serializes | Example output                            |
+| ------------------------ | ---------- | ----------------------------------------- |
+| `DateFnsValueToStrategy` | `Date`     | `2024-01-15` (default), `01/15/2024`, ... |
+
+Use it when the backend wants a **specific human readable shape** rather than an ISO instant or an epoch number: a date-only `yyyy-MM-dd` filter, a US style `MM/dd/yyyy` report parameter, a `yyyyMM` bucket key, and so on. Only dates are supported; durations and periods are not part of this package.
+
+---
+
+## ⚡ Usage
+
+```ts
+import { DefaultDateValueFromStrategy, ParamsProcessor, createValueConverter } from '@adaskothebeast/http-params-processor-core';
+import { LuxonDateTimeValueFromStrategy } from '@adaskothebeast/http-params-processor-value-from-luxon';
+import { DateFnsValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-date-fns';
+import { DateTime } from 'luxon';
+
+const processor = new ParamsProcessor({
+  valueConverters: [
+    createValueConverter(
+      new LuxonDateTimeValueFromStrategy(),
+      new DateFnsValueToStrategy(), // yyyy-MM-dd
+    ),
+    // keep native Dates working too
+    createValueConverter(new DefaultDateValueFromStrategy(), new DateFnsValueToStrategy()),
+  ],
+});
+
+processor.process('p', {
+  day: DateTime.fromISO('2024-01-15T10:30:00Z'),
+});
+// [['p.day', '2024-01-15']]
 ```
 
-To run any task with Nx use:
+A different format is a constructor argument:
 
-```sh
-npx nx <target> <project-name>
+```ts
+const usDate = new DateFnsValueToStrategy('MM/dd/yyyy');
+usDate.serializeValue(new Date('2024-01-15T00:00:00.000Z')); // '01/15/2024'
+
+const localDateTime = new DateFnsValueToStrategy("yyyy-MM-dd'T'HH:mm:ss");
+localDateTime.serializeValue(new Date('2024-01-15T10:30:45.000Z'));
+// '2024-01-15T11:30:45' in UTC+1, '2024-01-15T10:30:45' in UTC
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Because the format lives on the instance, you can register **several converters with different formats** and let the value-from strategies decide which one claims a value, or build one processor per endpoint shape.
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Versioning and releasing
+## 🎛️ Options and formats
 
-To version and release the library use
+| Constructor parameter | Type     | Default        | Meaning                                    |
+| --------------------- | -------- | -------------- | ------------------------------------------ |
+| `formatString`        | `string` | `'yyyy-MM-dd'` | Passed straight to `format(date, pattern)` |
 
-```
-npx nx release
-```
+That single argument is the whole API. `serializeValue` calls `format(value, this.formatString)` from `date-fns` with **no options object**, which has two consequences worth knowing:
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+- formatting happens in the **runtime local time zone**, since that is what `format` does,
+- `date-fns` options such as `locale`, `weekStartsOn`, `useAdditionalDayOfYearTokens` and `useAdditionalWeekYearTokens` cannot be forwarded. If you need locale aware month or weekday names, format the value yourself before it reaches the processor.
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Any Unicode token string that `date-fns` accepts works:
 
-## Keep TypeScript project references up to date
+| `formatString`          | Output for `2024-01-15T10:30:45Z` (in UTC) |
+| ----------------------- | ------------------------------------------ |
+| `yyyy-MM-dd` (default)  | `2024-01-15`                               |
+| `MM/dd/yyyy`            | `01/15/2024`                               |
+| `dd.MM.yyyy`            | `15.01.2024`                               |
+| `yyyy-MM-dd HH:mm`      | `2024-01-15 10:30`                         |
+| `yyyy-MM-dd'T'HH:mm:ss` | `2024-01-15T10:30:45`                      |
+| `yyyyMMdd`              | `20240115`                                 |
+| `yyyy-MM`               | `2024-01`                                  |
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+---
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
+## 📤 Output examples
 
-```sh
-npx nx sync
-```
-
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
-```
-
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
-
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+```text
+p.day=2024-01-15
+p.reportDate=01%2F15%2F2024
+p.bucket=2024-01
+p.stampedAt=2024-01-15T10%3A30%3A45
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+---
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## ⚠️ Edge cases
 
-### Step 2
+- **Local time zone, not UTC.** `format` renders wall-clock time in whatever zone the process runs in, so `2024-01-15T23:30:00Z` becomes `2024-01-16` in UTC+2 and `2024-01-15` in UTC. Pin `TZ` in CI, or convert to the intended zone before serializing (`date-fns-tz`, or the corresponding helper of your date library).
+- **Protected tokens throw.** In `date-fns` v2 and later, `YYYY`, `YY`, `D` and `DD` raise a `RangeError` telling you to use `yyyy`, `yy`, `d` or `dd`, because `Y` means week-numbering year and `D` means day of year. Since this strategy passes no options object, the escape hatches (`useAdditionalWeekYearTokens`, `useAdditionalDayOfYearTokens`) are unreachable - just use the lowercase tokens.
+- The format string is **not validated at construction time**. A bad pattern only fails when the first value is serialized, i.e. during `process`.
+- Literal text must be quoted with single quotes (`"yyyy-MM-dd'T'HH:mm:ss"`), otherwise letters are interpreted as tokens. A literal single quote is written as `''`.
+- `canHandle` accepts **only real `Date` instances** and rejects **invalid dates** (`new Date('invalid')`), which also keeps `format` from throwing `Invalid time value`. Strings such as `'2024-01-01'` are rejected as well and fall through to the next converter.
+- Date-only formats are **lossy**: `yyyy-MM-dd` drops the time, so a range filter built from two timestamps silently widens to whole days.
+- `date-fns` is a **peer dependency**, so the consumer controls the version, and locale or time zone helpers stay optional sub-imports that this package never pulls in.
+- If you only need a UTC ISO instant, [`-value-to-iso`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-iso) does it without any dependency.
 
-Use the following command to configure a CI workflow for your workspace:
+---
 
-```sh
-npx nx g ci-workflow
-```
+## 🔗 Related packages
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- Inputs: [`-value-from-luxon`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-luxon), [`-value-from-dayjs`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-dayjs), [`-value-from-moment`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-moment), [`-value-from-js-joda`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-js-joda)
+- Other outputs: [`-value-to-iso`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-iso), [`-value-to-nodatime`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-nodatime), [`-value-to-unix-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-unix-timestamp), [`-value-to-ms-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-ms-timestamp)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
 
-## Install Nx Console
+Full matrix and adapter recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+---
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📄 License
 
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+[MIT](./LICENSE) © Adam Pluciński

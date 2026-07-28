@@ -1,109 +1,202 @@
-# Adaskothebeast
+# ⚛️ @adaskothebeast/http-params-processor-react-swr
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**The SWR adapter of [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): the flattened URL becomes the SWR key, so nested params cache and revalidate correctly.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-react-swr?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-react-swr)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+No runtime dependency beyond `core` and SWR; requests use the platform `fetch`. ESM only (`"type": "module"`). `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-react-swr @adaskothebeast/http-params-processor-core
 ```
 
-## Run tasks
+Peer dependencies: `@adaskothebeast/http-params-processor-core ^12.0.0`, `swr ^2.3.8`.
 
-To build the library use:
+---
 
-```sh
-npx nx build pkg1
+## 🎯 What it does
+
+`useSWRWithParams` flattens `params` under `paramsKey`, appends the query string to `url`, and passes that **complete URL string as the SWR key**:
+
+```text
+url:      /api/users
+key:      /api/users?filter.status=active
+fetcher:  GET on that key
 ```
 
-To run any task with Nx use:
+Because the key is a string derived from the serialized params, cache identity is exact and stable across renders with no memoization needed.
 
-```sh
-npx nx <target> <project-name>
+---
+
+## 🧰 API
+
+| Export                                                          | Returns                           | Notes                                                    |
+| --------------------------------------------------------------- | --------------------------------- | -------------------------------------------------------- |
+| `useSWRWithParams<TData, TError>(options)`                      | `SWRResponse<TData, TError>`      | Hook; wraps `useSWR(fullUrl, fetcher, swrOptions)`       |
+| `createSWRKey(url, paramsKey, params, processorOptions?)`       | `Key`                             | The same string key, for manual `useSWR`/`mutate` calls  |
+| `createFetcherWithParams<TData>(options)`                       | `(url: string) => Promise<TData>` | A fetcher that appends the params to the URL it receives |
+| `buildUrlWithParams(url, paramsKey, params, processorOptions?)` | `string`                          | The URL builder used internally                          |
+| `getProcessedUrl(url, paramsKey, params, processorOptions?)`    | `string`                          | Alias of `buildUrlWithParams`, handy for debugging       |
+
+### Options
+
+`UseSWRWithParamsOptions<TData, TError>`:
+
+| Option             | Type                              | Default             |
+| ------------------ | --------------------------------- | ------------------- |
+| `url`              | `string`                          | required            |
+| `paramsKey`        | `string`                          | required            |
+| `params`           | `Record<string, unknown>`         | required            |
+| `processorOptions` | `SWRParamsProcessorOptions`       | core defaults       |
+| `swrOptions`       | `SWRConfiguration<TData, TError>` | SWR defaults        |
+| `fetchFn`          | `typeof fetch`                    | global `fetch`      |
+| `fetchOptions`     | `RequestInit`                     | `{ method: 'GET' }` |
+
+`SWRParamsProcessorOptions` is `{ keyFormatter?, valueConverters? }`.
+
+`createFetcherWithParams` takes `{ paramsKey, params, processorOptions?, fetchFn?, fetchOptions? }`.
+
+---
+
+## ⚡ Usage
+
+```tsx
+import { useSWRWithParams } from '@adaskothebeast/http-params-processor-react-swr';
+
+function Users() {
+  const { data, error, isLoading, mutate } = useSWRWithParams<User[]>({
+    url: '/api/users',
+    paramsKey: 'filter',
+    params: {
+      status: 'active',
+      roles: ['admin', 'user'],
+      dateRange: { from: new Date('2024-01-01'), to: new Date('2024-12-31') },
+    },
+    swrOptions: { revalidateOnFocus: false, keepPreviousData: true },
+  });
+
+  if (isLoading) return <Spinner />;
+  if (error) return <Error error={error} />;
+  return <UserList users={data ?? []} onRefresh={() => mutate()} />;
+}
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Wiring SWR yourself, for example to support conditional fetching:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```ts
+import { createSWRKey } from '@adaskothebeast/http-params-processor-react-swr';
+import useSWR from 'swr';
 
-## Versioning and releasing
+const key = enabled ? createSWRKey('/api/users', 'filter', { status }) : null;
 
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+const { data } = useSWR<User[]>(key, (url: string) => fetch(url).then((r) => r.json()));
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+Reusing the fetcher with a **base** URL as the key:
 
-```sh
-npx nx sync:check
+```ts
+import { createFetcherWithParams } from '@adaskothebeast/http-params-processor-react-swr';
+import useSWR from 'swr';
+
+const fetcher = createFetcherWithParams<User[]>({
+  paramsKey: 'filter',
+  params: { status: 'active' },
+  fetchOptions: { credentials: 'include' },
+});
+
+const { data } = useSWR<User[]>('/api/users', fetcher);
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+Invalidating a specific entry:
 
-## Set up CI!
+```ts
+import { mutate } from 'swr';
 
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+await mutate(createSWRKey('/api/users', 'filter', { status: 'active' }));
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+---
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🎛️ Options and configuration
 
-### Step 2
+```ts
+import { FlatKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-key-flat';
 
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+useSWRWithParams<User[]>({
+  url: '/api/users',
+  paramsKey: 'filter',
+  params: { user: { name: 'John' } },
+  processorOptions: { keyFormatter: new FlatKeyFormattingStrategy('_') },
+});
+// /api/users?filter_user_name=John
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+`processorOptions` is per call; there is no provider or global registry. A fresh `ParamsProcessor` is created inside `buildUrlWithParams` each time, so the options object is the only place configuration lives. `swrOptions` is forwarded to `useSWR` untouched, so all of SWR's configuration (dedupe interval, refresh interval, `fallbackData`, `onError`, …) applies.
 
-## Install Nx Console
+Providing `valueConverters` replaces the core defaults, so include a `Date` converter if you still pass native dates.
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+---
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📤 Output examples
 
-## Useful links
+```ts
+buildUrlWithParams('/api/users', 'filter', { status: 'active', count: 10 });
+// /api/users?filter.status=active&filter.count=10
 
-Learn more:
+buildUrlWithParams('/api/users', 'filter', { user: { name: 'John', age: 30 } });
+// /api/users?filter.user.name=John&filter.user.age=30
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+buildUrlWithParams('/api/users', 'filter', { roles: ['admin', 'user'] });
+// /api/users?filter.roles%5B0%5D=admin&filter.roles%5B1%5D=user
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+buildUrlWithParams('/api/users', 'filter', {
+  createdAt: new Date('2024-01-01T00:00:00.000Z'),
+});
+// /api/users?filter.createdAt=2024-01-01T00%3A00%3A00.000Z
+
+buildUrlWithParams('/api/users?page=1', 'filter', { status: 'active' });
+// /api/users?page=1&filter.status=active
+
+buildUrlWithParams('/api/users', 'filter', { a: null, b: undefined });
+// /api/users
+
+createSWRKey('/api/users', 'filter', { status: 'active' });
+// '/api/users?filter.status=active'
+```
+
+---
+
+## ⚠️ Edge cases
+
+- The hook's key is a **string**, never `null`, so `useSWRWithParams` always fetches. For conditional fetching, build the key with `createSWRKey` and pass `null` to `useSWR` yourself, as shown above.
+- Do **not** feed a `createSWRKey` result into `createFetcherWithParams`. That fetcher appends the params again to whatever URL it receives, and since the URL already contains a `?`, you would get the parameters twice. Pair the fetcher with the plain base URL.
+- Non-`ok` responses throw `Error: HTTP error! status: <status>`; the body is not read, so parse errors yourself through `fetchFn` if you need details.
+- The response is always parsed with `response.json()`. Endpoints returning `204 No Content` or text will reject.
+- `fetchOptions` is spread **after** `method: 'GET'`, so passing `method` there overrides the verb (params still go in the query string, not the body).
+- Keys are compared as strings, so two params objects that serialize identically share one cache entry, while property reordering produces a different key and therefore a separate entry.
+- `buildUrlWithParams` returns the base URL unchanged when nothing is produced, and picks `&` over `?` when the URL already contains a `?`.
+- `null`/`undefined` params are skipped, `$type` is ignored, and circular references throw `Error: Circular reference detected at key: <key>` while the URL is being built (during render, since the key is computed eagerly).
+- Keys are encoded, so bracket characters appear as `%5B`/`%5D` in the final URL and in the SWR key.
+
+---
+
+## 🔗 Related packages
+
+- TanStack Query instead of SWR: [`-react-tanstack-query`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-react-tanstack-query)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
+- Other adapters: [`-fetch`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-fetch), [`-axios`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-axios), [`-angular`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-angular), [`-angular-resource`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-angular-resource)
+- Key formatting: `-key-bracket-notation`, `-key-rails`, `-key-flat`, `-key-custom-delimiter`, `-key-json`
+- Values: `-value-from-*` and `-value-to-*`
+
+Full matrix and recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
+
+---
+
+## 📄 License
+
+[MIT](./LICENSE) © Adam Pluciński

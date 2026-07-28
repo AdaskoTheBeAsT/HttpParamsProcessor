@@ -1,109 +1,168 @@
-# Adaskothebeast
+# 🛤️ @adaskothebeast/http-params-processor-key-rails
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**Ruby on Rails and Rack style key formatting for [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): `user[name]` for objects, `items[]` for array elements.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-key-rails?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-rails)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+No runtime dependency beyond `core` (its only peer dependency, `^12.0.0`). ESM + CJS. `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-key-rails @adaskothebeast/http-params-processor-core
 ```
 
-## Run tasks
+---
 
-To build the library use:
+## 🎯 What it does
 
-```sh
-npx nx build pkg1
+This is a **key formatting strategy**: it decides how nested keys are spelled while `ParamsProcessor` walks your object graph. It emits exactly what `Rack::Utils.parse_nested_query` (and therefore Rails `params`) expects: brackets around object properties and **empty brackets** for array elements.
+
+| Input                                 | `DefaultKeyFormattingStrategy` (core) | `RailsKeyFormattingStrategy` (default) |
+| ------------------------------------- | ------------------------------------- | -------------------------------------- |
+| `{ user: { name: 'John' } }`          | `p.user.name`                         | `p[user][name]`                        |
+| `{ items: ['x', 'y'] }`               | `p.items[0]`, `p.items[1]`            | `p[items][]` twice                     |
+| `{ arr: [{ id: '1' }, { id: '2' }] }` | `p.arr[0].id`, `p.arr[1].id`          | `p[arr][][id]` twice                   |
+
+Rack rebuilds arrays of hashes positionally: it starts a new hash whenever a key repeats, so `arr[][id]=1&arr[][id]=2` parses back to `[{ id: 1 }, { id: 2 }]`.
+
+---
+
+## 🧰 API
+
+### `RailsKeyFormattingStrategy`
+
+Implements `IKeyFormattingStrategy` from `core`.
+
+| Member                                         | Returns  | Result                                                   |
+| ---------------------------------------------- | -------- | -------------------------------------------------------- |
+| `new RailsKeyFormattingStrategy(arrayFormat?)` | -        | `arrayFormat` defaults to `'brackets'`                   |
+| `formatObjectKey(parentKey, propertyKey)`      | `string` | `` `${parentKey}[${propertyKey}]` `` in both formats     |
+| `formatArrayKey(parentKey, index)`             | `string` | `` `${parentKey}[]` `` or `` `${parentKey}[${index}]` `` |
+
+### `RailsArrayFormat`
+
+```ts
+type RailsArrayFormat = 'brackets' | 'indexed';
 ```
 
-To run any task with Nx use:
+| Value                  | Array key  | Use when                                                                 |
+| ---------------------- | ---------- | ------------------------------------------------------------------------ |
+| `'brackets'` (default) | `items[]`  | Idiomatic Rails/Rack: order carries the position                         |
+| `'indexed'`            | `items[0]` | Explicit indices, also accepted by Rack, needed for arrays inside arrays |
 
-```sh
-npx nx <target> <project-name>
+`transformComplexObject` is not implemented, so nested objects and arrays are always traversed down to primitives.
+
+---
+
+## ⚡ Usage
+
+```ts
+import { createParamsProcessor } from '@adaskothebeast/http-params-processor-core';
+import { RailsKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-key-rails';
+
+const processor = createParamsProcessor({
+  keyFormatter: new RailsKeyFormattingStrategy(),
+});
+
+processor.process('p', { items: ['x', 'y'] });
+// [['p[items][]', 'x'], ['p[items][]', 'y']]
+
+processor.process('p', {
+  arr: [
+    { id: '1', text: 'first' },
+    { id: '2', text: 'second' },
+  ],
+});
+// [
+//   ['p[arr][][id]', '1'],
+//   ['p[arr][][text]', 'first'],
+//   ['p[arr][][id]', '2'],
+//   ['p[arr][][text]', 'second'],
+// ]
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+`process` preserves duplicate keys and their order, which is precisely what the empty bracket format relies on. The same `keyFormatter` option is accepted by every adapter (`-angular`, `-angular-resource`, `-fetch`, `-axios`, `-react-tanstack-query`, `-react-swr`).
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Versioning and releasing
+## 🎛️ Options and configuration
 
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+```ts
+new RailsKeyFormattingStrategy(); // 'brackets' - items[]
+new RailsKeyFormattingStrategy('brackets'); // same, explicit
+new RailsKeyFormattingStrategy('indexed'); // items[0]
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+Object keys are bracketed in both modes; only array element keys differ.
 
-```sh
-npx nx sync:check
+```ts
+const processor = createParamsProcessor({
+  keyFormatter: new RailsKeyFormattingStrategy('indexed'),
+});
+
+processor.process('p', { arr: [{ id: '1' }, { id: '2' }] });
+// [['p[arr][0][id]', '1'], ['p[arr][1][id]', '2']]
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+The strategy is stateless, so instances can be shared, and `keyFormatter` can also be passed per call to override the processor default.
 
-## Set up CI!
+---
 
-### Step 1
+## 📤 Output examples
 
-To connect to Nx Cloud, run the following command:
+```text
+'brackets' (default)
+p[items][]        = x
+p[items][]        = y
+p[arr][][id]      = 1
+p[arr][][text]    = first
+p[arr][][id]      = 2
+p[arr][][text]    = second
 
-```sh
-npx nx connect
+'indexed'
+p[arr][0][id]     = 1
+p[arr][1][id]     = 2
+p[user][tags][2]  = ruby
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+```ts
+processor.toQueryString('p', { items: ['x', 'y'] });
+// p%5Bitems%5D%5B%5D=x&p%5Bitems%5D%5B%5D=y
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
+processor.toPlainObject('p', { items: ['x', 'y'] });
+// { 'p[items][]': ['x', 'y'] }   duplicate keys collapse into an array
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+On the server, `p[items][]=x&p[items][]=y` becomes `params[:p][:items] == ['x', 'y']` in Rails, and Node's `qs` parses it into `{ p: { items: ['x', 'y'] } }`.
 
-## Install Nx Console
+---
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## ⚠️ Edge cases
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- In `'brackets'` mode the **index is ignored**: `formatArrayKey('items', 7)` is still `items[]`. Position comes from the order of the emitted pairs, so never sort or deduplicate the entries before sending them.
+- Rack's positional grouping cannot disambiguate an **array nested directly inside an array element** (`arr[][inner][]`); switch to `new RailsKeyFormattingStrategy('indexed')` for such payloads.
+- Grouping also breaks if two sibling elements do not carry the same properties (a `null`/`undefined` property is skipped by `core`, so that element emits fewer pairs and Rack may merge it with the next one). Use `'indexed'` for sparse objects.
+- `toPlainObject` merges the repeated `items[]` key into a string array, which is what `axios` `params` needs; `process` keeps the duplicates separate.
+- An **empty root key** yields keys starting with a bracket (`[user]`), so pass a real root name.
+- Numeric object property keys stay object keys: `formatObjectKey('data', '0')` gives `data[0]`.
+- `null`/`undefined` values, `$type` discriminators, empty objects and empty arrays are dropped by `core` before this strategy is consulted; circular references throw `Error: Circular reference detected at key: <key>`.
 
-## Useful links
+---
 
-Learn more:
+## 🔗 Related packages
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- Same object shape, indexed arrays only: [`-key-bracket-notation`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-bracket-notation) (PHP, Laravel, Symfony)
+- Other key strategies: [`-key-flat`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-flat) (`user_name`), [`-key-custom-delimiter`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-custom-delimiter) (`user:name`), [`-key-json`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-json) (whole subtree as one JSON value)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Full matrix and adapter recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
+
+---
+
+## 📄 License
+
+[MIT](./LICENSE) © Adam Pluciński

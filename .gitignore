@@ -47,3 +47,8 @@ vitest.config.*.timestamp*
 .angular
 
 __screenshots__/
+
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing
+.nx/migrate-runs

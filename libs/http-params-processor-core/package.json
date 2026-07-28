@@ -1,6 +1,21 @@
 {
   "name": "@adaskothebeast/http-params-processor-core",
-  "version": "11.1.0",
+  "version": "12.0.0",
+  "description": "Framework agnostic processor that turns deeply nested objects and arrays into HTTP query parameters your backend can model bind. Zero dependencies.",
+  "keywords": [
+    "http",
+    "http-params",
+    "query-string",
+    "query-params",
+    "querystring",
+    "nested-objects",
+    "serializer",
+    "typescript",
+    "url-search-params",
+    "model-binding",
+    "deep-object",
+    "zero-dependencies"
+  ],
   "license": "MIT",
   "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
   "repository": {
@@ -12,6 +27,7 @@
   },
   "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -1,4 +1,10 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  copyFileSync,
+} from 'node:fs';
 import { join } from 'node:path';
 
 const libRoot = process.argv[2];
@@ -50,15 +56,25 @@ const relTypes = relFromDist(typesFile) ?? './index.d.ts';
 const distPkg = {
   name: sourcePkg.name,
   version: sourcePkg.version ?? '0.0.0',
+  ...(sourcePkg.description ? { description: sourcePkg.description } : {}),
+  ...(sourcePkg.keywords ? { keywords: sourcePkg.keywords } : {}),
   license: sourcePkg.license,
   author: sourcePkg.author,
   repository: sourcePkg.repository,
   bugs: sourcePkg.bugs,
   homepage: sourcePkg.homepage,
   type: 'module',
+  sideEffects: sourcePkg.sideEffects ?? false,
   main: relCjs,
   module: relEsm,
   types: relTypes,
+  ...(sourcePkg.dependencies ? { dependencies: sourcePkg.dependencies } : {}),
+  ...(sourcePkg.peerDependencies
+    ? { peerDependencies: sourcePkg.peerDependencies }
+    : {}),
+  ...(sourcePkg.peerDependenciesMeta
+    ? { peerDependenciesMeta: sourcePkg.peerDependenciesMeta }
+    : {}),
   exports: {
     '.': {
       types: relTypes,
@@ -67,10 +83,20 @@ const distPkg = {
     },
     './package.json': './package.json',
   },
+  files: ['**/*', '!**/*.tsbuildinfo'],
 };
 
 mkdirSync(distDir, { recursive: true });
 writeFileSync(join(distDir, 'package.json'), JSON.stringify(distPkg, null, 2));
+
+for (const asset of ['README.md', 'LICENSE']) {
+  const from = join(libRoot, asset);
+  if (exists(from)) {
+    copyFileSync(from, join(distDir, asset));
+  } else {
+    console.warn(`[emit-package-json] ${libRoot}: missing ${asset}`);
+  }
+}
 
 // Add type-only package.json files for folder-specific resolution
 // Add type-only package.json in subfolders when they exist

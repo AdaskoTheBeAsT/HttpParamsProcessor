@@ -59,9 +59,10 @@ export class AxiosParamsProcessor {
    * const processor = new AxiosParamsProcessor();
    *
    * axios.get('/api', {
-   *   params: { filters: { status: 'active' } },
-   *   paramsSerializer: (params) => processor.serialize('', params)
+   *   params: { status: 'active' },
+   *   paramsSerializer: (params) => processor.serialize('filter', params)
    * });
+   * // filter.status=active
    * ```
    */
   serialize(
@@ -85,7 +86,9 @@ export class AxiosParamsProcessor {
    * Create a paramsSerializer function for Axios.
    * The returned function can be used directly in Axios config.
    *
-   * @param key - The root parameter name (use empty string for no prefix)
+   * @param key - The root parameter name. An empty string is not a "no prefix"
+   * shortcut: the key formatter still joins it with the first property, so the
+   * default dot formatter emits a leading delimiter (`.status=active`).
    * @param options - Optional configuration
    * @returns A function compatible with Axios paramsSerializer
    *
@@ -94,7 +97,7 @@ export class AxiosParamsProcessor {
    * const processor = new AxiosParamsProcessor();
    *
    * // Global Axios config
-   * axios.defaults.paramsSerializer = processor.createSerializer('');
+   * axios.defaults.paramsSerializer = processor.createSerializer('filter');
    *
    * // Per-request config
    * axios.get('/api', {
@@ -149,15 +152,16 @@ export class AxiosParamsProcessor {
  *
  * @example
  * ```typescript
- * import { createAxiosParamsProcessor } from '@adaskothebeast/params-processor-axios';
+ * import { createAxiosParamsProcessor } from '@adaskothebeast/http-params-processor-axios';
  *
  * const processor = createAxiosParamsProcessor();
  *
  * // Use with Axios
  * axios.get('/api/products', {
- *   params: { filter: { category: 'electronics', price: { min: 100 } } },
- *   paramsSerializer: processor.createSerializer('')
+ *   params: { category: 'electronics', price: { min: 100 } },
+ *   paramsSerializer: processor.createSerializer('filter')
  * });
+ * // filter.category=electronics&filter.price.min=100
  * ```
  */
 export function createAxiosParamsProcessor(
@@ -176,7 +180,7 @@ export function createAxiosParamsProcessor(
  *
  * @example
  * ```typescript
- * import { createParamsSerializer } from '@adaskothebeast/params-processor-axios';
+ * import { createParamsSerializer } from '@adaskothebeast/http-params-processor-axios';
  *
  * axios.get('/api', {
  *   params: myObject,

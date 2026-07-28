@@ -8,6 +8,7 @@ import {
   IValueToStrategy,
   Primitive,
   ValueConverter,
+  isPlainObjectOrArray,
 } from '@adaskothebeast/http-params-processor-core';
 import { HttpParams } from '@angular/common/http';
 import { Injectable, InjectionToken, inject } from '@angular/core';
@@ -31,10 +32,7 @@ export const HTTP_PARAMS_VALUE_CONVERTERS = new InjectionToken<
  * Type alias for values that can be processed by the HttpParamsProcessorService.
  */
 type ProcessableValue =
-  | Record<string | number | symbol, unknown>
-  | null
-  | unknown
-  | unknown[];
+  Record<string | number | symbol, unknown> | null | unknown | unknown[];
 
 /**
  * Options for processing query parameters.
@@ -169,6 +167,15 @@ export class HttpParamsProcessorService {
   ): HttpParams {
     if (obj == null) {
       return params;
+    }
+
+    // Non-plain objects (Date, Decimal, Uint8Array, ...) are offered to the
+    // converters before traversal, otherwise they would be walked as objects.
+    if (typeof obj === 'object' && !isPlainObjectOrArray(obj)) {
+      const converter = valueConverters.find((c) => c.canHandle(obj));
+      if (converter) {
+        return params.append(key, converter.convert(obj));
+      }
     }
 
     if (

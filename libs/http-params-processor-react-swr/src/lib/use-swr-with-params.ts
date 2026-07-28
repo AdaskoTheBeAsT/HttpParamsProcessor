@@ -215,7 +215,7 @@ export function createSWRKey(
  *   'filter',
  *   { status: 'active', roles: ['admin'] }
  * );
- * // Returns: /api/users?filter.status=active&filter.roles[0]=admin
+ * // Returns: /api/users?filter.status=active&filter.roles%5B0%5D=admin
  * ```
  */
 export function getProcessedUrl(

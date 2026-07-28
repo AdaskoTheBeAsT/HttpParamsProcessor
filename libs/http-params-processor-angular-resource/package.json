@@ -1,6 +1,22 @@
 {
   "name": "@adaskothebeast/http-params-processor-angular-resource",
-  "version": "11.1.0",
+  "version": "12.0.0",
+  "description": "Angular httpResource helpers that build signal driven requests from deeply nested query parameter objects.",
+  "keywords": [
+    "http",
+    "http-params",
+    "query-string",
+    "query-params",
+    "querystring",
+    "nested-objects",
+    "serializer",
+    "typescript",
+    "angular",
+    "httpresource",
+    "signals",
+    "resource",
+    "ng"
+  ],
   "license": "MIT",
   "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
   "repository": {
@@ -12,9 +28,9 @@
   },
   "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
   "peerDependencies": {
-    "@adaskothebeast/http-params-processor-angular": "^11.0.0",
-    "@angular/common": ">=21.0.0",
-    "@angular/core": ">=21.0.0"
+    "@adaskothebeast/http-params-processor-angular": "^12.0.0",
+    "@angular/common": ">=22.0.8",
+    "@angular/core": ">=22.0.8"
   },
   "sideEffects": false
 }

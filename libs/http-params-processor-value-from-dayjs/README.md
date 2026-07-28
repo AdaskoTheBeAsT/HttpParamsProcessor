@@ -1,109 +1,128 @@
-# Adaskothebeast
+# 📆 @adaskothebeast/http-params-processor-value-from-dayjs
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**Day.js input strategies for [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): normalize `Dayjs` instants and Day.js `Duration` objects before they are serialized.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-value-from-dayjs?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-dayjs)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+Peer dependencies: `core` and `dayjs` (`^1.11.21`). ESM + CJS. `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-value-from-dayjs @adaskothebeast/http-params-processor-core dayjs
 ```
 
-## Run tasks
+No extra plugin package is needed: the duration strategy pulls `dayjs/plugin/duration` in itself.
 
-To build the library use:
+---
 
-```sh
-npx nx build pkg1
+## 🎯 What it does
+
+These are **value-from** strategies: the first half of the conversion pipeline. Each one normalizes a Day.js type into a neutral shape and must be paired with a **value-to** strategy (`-value-to-iso`, `-value-to-nodatime`, `-value-to-unix-timestamp`, `-value-to-ms-timestamp`, `-value-to-date-fns`) through `createValueConverter`.
+
+| Class                            | Accepts                                     | Produces                                                                                        |
+| -------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `DayjsDateValueFromStrategy`     | `Dayjs` (detected by `dayjs.isDayjs`)       | `Date` (`value.toDate()`)                                                                       |
+| `DayjsDurationValueFromStrategy` | `Duration` (detected by `dayjs.isDuration`) | `DurationComponents` (`years`, `months`, `days`, `hours`, `minutes`, `seconds`, `milliseconds`) |
+
+Detection is exact and mutually exclusive: a `Dayjs` object is never claimed by the duration strategy and vice versa, so both converters can be registered side by side.
+
+---
+
+## ⚡ Usage
+
+```ts
+import { DefaultDateValueFromStrategy, ParamsProcessor, createValueConverter } from '@adaskothebeast/http-params-processor-core';
+import { DayjsDateValueFromStrategy, DayjsDurationValueFromStrategy } from '@adaskothebeast/http-params-processor-value-from-dayjs';
+import { IsoDateValueToStrategy, IsoDurationValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-iso';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+
+dayjs.extend(duration);
+
+const processor = new ParamsProcessor({
+  valueConverters: [
+    createValueConverter(new DayjsDateValueFromStrategy(), new IsoDateValueToStrategy()),
+    createValueConverter(new DayjsDurationValueFromStrategy(), new IsoDurationValueToStrategy()),
+    // keep native Dates working too
+    createValueConverter(new DefaultDateValueFromStrategy(), new IsoDateValueToStrategy()),
+  ],
+});
+
+processor.process('p', {
+  from: dayjs('2024-01-15T10:30:00.000Z'),
+  window: dayjs.duration({ hours: 1, minutes: 30, seconds: 45 }),
+});
+// [['p.from', '2024-01-15T10:30:00.000Z'], ['p.window', 'PT1H30M45S']]
 ```
 
-To run any task with Nx use:
+---
 
-```sh
-npx nx <target> <project-name>
+## 🎛️ Options and configuration
+
+Neither strategy takes constructor options - both are stateless and safe to share between processors.
+
+**The duration plugin.** `DayjsDurationValueFromStrategy` imports `dayjs/plugin/duration` and calls `dayjs.extend(durationPlugin)` at module load, so the plugin is always registered before the strategy runs. Your own code still needs its own `dayjs.extend(duration)` call to create durations: it gives you the `dayjs.duration` typings and makes the call independent of import order.
+
+**Output format** is decided entirely by the paired value-to strategy. `Dayjs` normalizes to a `Date` (an instant), so any date writer works:
+
+```ts
+import { UnixTimestampValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-unix-timestamp';
+
+createValueConverter(new DayjsDateValueFromStrategy(), new UnixTimestampValueToStrategy());
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+**Registration order** matters only against strategies with overlapping detection. Put these before `DefaultDateValueFromStrategy` if you also register it - `Dayjs` is not a `Date`, so in practice they never compete.
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Versioning and releasing
+## 📤 Output examples
 
-To version and release the library use
+Paired with `-value-to-iso`:
 
-```
-npx nx release
-```
+| Value passed to `process`                   | Normalized shape            | Serialized                 |
+| ------------------------------------------- | --------------------------- | -------------------------- |
+| `dayjs('2024-01-15T10:30:00.000Z')`         | `Date` (instant)            | `2024-01-15T10:30:00.000Z` |
+| `dayjs.duration({ hours: 1, minutes: 30 })` | `{ hours: 1, minutes: 30 }` | `PT1H30M`                  |
+| `dayjs.duration({ minutes: 90 })`           | `{ minutes: 90 }`           | `PT90M`                    |
+| `dayjs.duration(5400000)`                   | `{ hours: 1, minutes: 30 }` | `PT1H30M`                  |
+| `dayjs.duration('PT1H30M')`                 | `{ hours: 1, minutes: 30 }` | `PT1H30M`                  |
+| `dayjs.duration({ months: 18 })`            | `{ months: 18 }`            | `P18M`                     |
+| `dayjs.duration({ days: 5, hours: 2 })`     | `{ days: 5, hours: 2 }`     | `P5DT2H`                   |
+| `dayjs.duration({ weeks: 2 })`              | `{}`                        | `PT0S`                     |
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+```text
+p.from    = 2024-01-15T10:30:00.000Z
+p.window  = PT1H30M45S
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+---
 
-```sh
-npx nx sync:check
-```
+## ⚠️ Edge cases
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+- **Weeks are dropped.** Day.js keeps `weeks` in its own slot and reports `days()` as `0` for `dayjs.duration({ weeks: 2 })`, and the strategy maps only `years`, `months`, `days` and the time fields. Such a duration normalizes to an empty object (`PT0S` with the ISO writer) - pass `{ days: 14 }` instead.
+- **Object-built durations are not normalized.** `dayjs.duration({ minutes: 90 })` stays `PT90M`; only millisecond and ISO-string inputs are split into hours/minutes/seconds by Day.js itself. Use `dayjs.duration(dur.asMilliseconds())` if you need the carried form.
+- Zero components are converted to `undefined`, so `{ hours: 1 }` never emits `0` days or minutes, and `dayjs.duration(0)` normalizes to an empty object.
+- **Invalid dates still pass `canHandle`.** `dayjs('not-a-date')` is a `Dayjs` object, so it is claimed and normalized to `Invalid Date`; `IsoDateValueToStrategy` then throws `RangeError: Invalid time value` (timestamp writers emit `NaN`). Filter with `.isValid()` before building your params object.
+- Time zone and UTC metadata (from `dayjs/plugin/timezone` or `dayjs/plugin/utc`) is **not** carried over: `toDate()` yields a plain instant, and the paired writer decides the rendering (the ISO writer always emits UTC with `Z`).
+- `dayjs.duration()` results are not instants; never pair `DayjsDurationValueFromStrategy` with a date writer such as `IsoDateValueToStrategy` - the converter always runs the paired writer, it does not re-check the shape.
+- **Avoid fractional seconds.** Day.js reports them twice: `dayjs.duration({ seconds: 1.5 })` yields `{ seconds: 1.5, milliseconds: 500 }`, and the ISO writer adds the fraction to the milliseconds, producing `PT2S`. Pass `{ seconds: 1, milliseconds: 500 }` instead.
 
-## Set up CI!
+---
 
-### Step 1
+## 🔗 Related packages
 
-To connect to Nx Cloud, run the following command:
+- Outputs: [`-value-to-iso`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-iso), [`-value-to-nodatime`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-nodatime), [`-value-to-unix-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-unix-timestamp), [`-value-to-ms-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-ms-timestamp), [`-value-to-date-fns`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-date-fns)
+- Other inputs: [`-value-from-luxon`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-luxon), [`-value-from-moment`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-moment), [`-value-from-js-joda`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-js-joda)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
 
-```sh
-npx nx connect
-```
+Full matrix and adapter recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+---
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📄 License
 
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+[MIT](./LICENSE) © Adam Pluciński

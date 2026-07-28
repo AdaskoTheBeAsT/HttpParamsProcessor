@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
+    "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "importHelpers": true,
@@ -57,6 +58,9 @@
       "@adaskothebeast/http-params-processor-value-from-dayjs": [
         "./libs/http-params-processor-value-from-dayjs/src/index.ts"
       ],
+      "@adaskothebeast/http-params-processor-value-from-decimal": [
+        "./libs/http-params-processor-value-from-decimal/src/index.ts"
+      ],
       "@adaskothebeast/http-params-processor-value-from-js-joda": [
         "./libs/http-params-processor-value-from-js-joda/src/index.ts"
       ],
@@ -66,8 +70,14 @@
       "@adaskothebeast/http-params-processor-value-from-moment": [
         "./libs/http-params-processor-value-from-moment/src/index.ts"
       ],
+      "@adaskothebeast/http-params-processor-value-from-uuid": [
+        "./libs/http-params-processor-value-from-uuid/src/index.ts"
+      ],
       "@adaskothebeast/http-params-processor-value-to-date-fns": [
         "./libs/http-params-processor-value-to-date-fns/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-to-decimal": [
+        "./libs/http-params-processor-value-to-decimal/src/index.ts"
       ],
       "@adaskothebeast/http-params-processor-value-to-iso": [
         "./libs/http-params-processor-value-to-iso/src/index.ts"
@@ -80,7 +90,14 @@
       ],
       "@adaskothebeast/http-params-processor-value-to-unix-timestamp": [
         "./libs/http-params-processor-value-to-unix-timestamp/src/index.ts"
+      ],
+      "@adaskothebeast/http-params-processor-value-to-uuid": [
+        "./libs/http-params-processor-value-to-uuid/src/index.ts"
       ]
-    }
+    },
+    "noUncheckedSideEffectImports": false,
+    "types": ["*"],
+    "esModuleInterop": false,
+    "ignoreDeprecations": "6.0"
   }
 }

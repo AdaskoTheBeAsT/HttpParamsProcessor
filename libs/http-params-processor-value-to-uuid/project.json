@@ -1,0 +1,41 @@
+{
+  "name": "@adaskothebeast/http-params-processor-value-to-uuid",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/http-params-processor-value-to-uuid/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "bundle": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "{workspaceRoot}/dist/libs/http-params-processor-value-to-uuid",
+        "main": "libs/http-params-processor-value-to-uuid/src/index.ts",
+        "tsConfig": "libs/http-params-processor-value-to-uuid/tsconfig.lib.json",
+        "format": [
+          "esm",
+          "cjs"
+        ],
+        "declaration": false,
+        "external": ["@adaskothebeast/*"],
+        "skipTypeCheck": true
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "parallel": false,
+        "commands": [
+          "nx run http-params-processor-value-to-uuid:bundle",
+          "tsc -p libs/http-params-processor-value-to-uuid/tsconfig.lib.json",
+          "node tools/emit-package-json.mjs libs/http-params-processor-value-to-uuid"
+        ]
+      },
+      "outputs": [
+        "{workspaceRoot}/dist/libs/http-params-processor-value-to-uuid"
+      ]
+    }
+  }
+}

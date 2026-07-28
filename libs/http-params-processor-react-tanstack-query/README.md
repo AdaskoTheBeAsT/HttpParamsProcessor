@@ -1,109 +1,208 @@
-# Adaskothebeast
+# ⚛️ @adaskothebeast/http-params-processor-react-tanstack-query
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**The TanStack Query adapter of [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): a `useQuery` hook that flattens nested params into the request URL for you.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-react-tanstack-query?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-react-tanstack-query)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+No runtime dependency beyond `core` and TanStack Query; requests use the platform `fetch`. ESM only (`"type": "module"`). `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-react-tanstack-query @adaskothebeast/http-params-processor-core
 ```
 
-## Run tasks
+Peer dependencies: `@adaskothebeast/http-params-processor-core ^12.0.0`, `@tanstack/react-query >=5.0.0`.
 
-To build the library use:
+---
 
-```sh
-npx nx build pkg1
+## 🎯 What it does
+
+`useQueryWithParams` builds the request URL from `url` + `paramsKey` + `params`, wires a `GET` fetcher, and derives the cache key from the same inputs:
+
+```text
+url:      /api/users
+queryKey: ['users', 'filter', { status: 'active' }]
+request:  /api/users?filter.status=active
 ```
 
-To run any task with Nx use:
+Everything else is plain TanStack Query, so `staleTime`, `enabled`, `select`, `retry` and friends still work.
 
-```sh
-npx nx <target> <project-name>
+---
+
+## 🧰 API
+
+| Export                                                          | Returns                         | Notes                                                    |
+| --------------------------------------------------------------- | ------------------------------- | -------------------------------------------------------- |
+| `useQueryWithParams<TData, TError>(options)`                    | `UseQueryResult<TData, TError>` | Hook; wraps `useQuery`                                   |
+| `createQueryOptionsWithParams<TData>(options)`                  | `queryOptions` object           | For `prefetchQuery`, `ensureQueryData` or sharing config |
+| `buildUrlWithParams(url, paramsKey, params, processorOptions?)` | `string`                        | The URL builder used internally                          |
+| `getProcessedUrl(url, paramsKey, params, processorOptions?)`    | `string`                        | Alias of `buildUrlWithParams`, handy for debugging       |
+
+### Options
+
+`UseQueryWithParamsOptions<TData, TError>` extends `UseQueryOptions` with `'queryKey' | 'queryFn'` omitted, and adds:
+
+| Option             | Type                          | Default             |
+| ------------------ | ----------------------------- | ------------------- |
+| `queryKey`         | `QueryKey`                    | required            |
+| `url`              | `string`                      | required            |
+| `paramsKey`        | `string`                      | required            |
+| `params`           | `Record<string, unknown>`     | required            |
+| `processorOptions` | `QueryParamsProcessorOptions` | core defaults       |
+| `fetchFn`          | `typeof fetch`                | global `fetch`      |
+| `fetchOptions`     | `RequestInit`                 | `{ method: 'GET' }` |
+
+`CreateQueryOptionsWithParamsOptions<TData>` accepts exactly the same fields **except** the TanStack options (no `staleTime`, `enabled`, …).
+
+`QueryParamsProcessorOptions` is `{ keyFormatter?, valueConverters? }`.
+
+---
+
+## ⚡ Usage
+
+```tsx
+import { useQueryWithParams } from '@adaskothebeast/http-params-processor-react-tanstack-query';
+
+function Users() {
+  const { data, isLoading, error } = useQueryWithParams<User[]>({
+    queryKey: ['users'],
+    url: '/api/users',
+    paramsKey: 'filter',
+    params: {
+      status: 'active',
+      roles: ['admin', 'user'],
+      dateRange: {
+        from: new Date('2024-01-01'),
+        to: new Date('2024-12-31'),
+      },
+    },
+    staleTime: 30_000,
+  });
+
+  if (isLoading) return <Spinner />;
+  if (error) return <Error error={error} />;
+  return <UserList users={data ?? []} />;
+}
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Prefetching or sharing configuration:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```ts
+import { createQueryOptionsWithParams } from '@adaskothebeast/http-params-processor-react-tanstack-query';
 
-## Versioning and releasing
-
-To version and release the library use
-
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+await queryClient.prefetchQuery(
+  createQueryOptionsWithParams<User[]>({
+    queryKey: ['users'],
+    url: '/api/users',
+    paramsKey: 'filter',
+    params: { status: 'active' },
+  }),
+);
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+Credentials, headers and a custom transport:
 
-```sh
-npx nx sync:check
+```ts
+useQueryWithParams<User[]>({
+  queryKey: ['users'],
+  url: '/api/users',
+  paramsKey: 'filter',
+  params: { status: 'active' },
+  fetchOptions: {
+    headers: { Accept: 'application/json' },
+    credentials: 'include',
+  },
+  fetchFn: myInstrumentedFetch,
+});
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+---
 
-## Set up CI!
+## 🎛️ Options and configuration
 
-### Step 1
+```ts
+import { BracketNotationKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-key-bracket-notation';
 
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+useQueryWithParams<User[]>({
+  queryKey: ['users'],
+  url: '/api/users',
+  paramsKey: 'filter',
+  params: { user: { name: 'John' } },
+  processorOptions: {
+    keyFormatter: new BracketNotationKeyFormattingStrategy(),
+  },
+});
+// /api/users?filter%5Buser%5D%5Bname%5D=John
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+`processorOptions` is per hook call; there is no provider or global registry here. A fresh `ParamsProcessor` is created inside `buildUrlWithParams` on every call, so the options object is the only place configuration lives.
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Providing `valueConverters` replaces the core defaults, so include a `Date` converter if you still pass native dates.
 
-### Step 2
+---
 
-Use the following command to configure a CI workflow for your workspace:
+## 📤 Output examples
 
-```sh
-npx nx g ci-workflow
+`buildUrlWithParams` / `getProcessedUrl` results:
+
+```ts
+buildUrlWithParams('/api/users', 'filter', { status: 'active', count: 10 });
+// /api/users?filter.status=active&filter.count=10
+
+buildUrlWithParams('/api/users', 'filter', { user: { name: 'John', age: 30 } });
+// /api/users?filter.user.name=John&filter.user.age=30
+
+buildUrlWithParams('/api/users', 'filter', { roles: ['admin', 'user'] });
+// /api/users?filter.roles%5B0%5D=admin&filter.roles%5B1%5D=user
+
+buildUrlWithParams('/api/users', 'filter', {
+  createdAt: new Date('2024-01-01T00:00:00.000Z'),
+});
+// /api/users?filter.createdAt=2024-01-01T00%3A00%3A00.000Z
+
+buildUrlWithParams('/api/users?page=1', 'filter', { status: 'active' });
+// /api/users?page=1&filter.status=active
+
+buildUrlWithParams('/api/users', 'filter', { a: null, b: undefined });
+// /api/users
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+The effective cache key is `[...queryKey, paramsKey, params]`, for example `['users', 'filter', { status: 'active' }]`.
 
-## Install Nx Console
+---
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+## ⚠️ Edge cases
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- The hook needs a `QueryClientProvider` above it, like any TanStack Query hook.
+- **Query key stability comes from TanStack Query's structural hashing**, not from object identity, so recreating the `params` literal on every render does not cause refetches. The trade-off: `params` must be hashable, so avoid functions or class instances that do not survive `JSON.stringify` inside it.
+- Because `paramsKey` and `params` are appended to your `queryKey`, two calls that differ only in params get separate cache entries automatically. Keep `queryKey` as the stable prefix (`['users']`).
+- Non-`ok` responses throw `Error: HTTP error! status: <status>`; the body is not read, so add your own error parsing through `fetchFn` if you need details.
+- The response is always parsed with `response.json()`. Endpoints that return `204 No Content` or text will reject.
+- `fetchOptions` is spread **after** `method: 'GET'`, so passing `method` there overrides the verb (the params still go in the query string, not the body).
+- `enabled: false` works as usual and prevents the request; there is no separate "skip" flag.
+- `createQueryOptionsWithParams` returns only `queryKey` and `queryFn`; spread extra TanStack options in yourself if you need them: `{ ...createQueryOptionsWithParams(...), staleTime: 60_000 }`.
+- `buildUrlWithParams` returns the base URL unchanged when nothing is produced, and picks `&` over `?` when the URL already contains a `?`.
+- `null`/`undefined` params are skipped, `$type` is ignored, and circular references throw `Error: Circular reference detected at key: <key>` while the URL is being built.
+- Keys are encoded, so bracket characters appear as `%5B`/`%5D` in the final URL.
 
-## Useful links
+---
 
-Learn more:
+## 🔗 Related packages
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- SWR instead of TanStack Query: [`-react-swr`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-react-swr)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
+- Other adapters: [`-fetch`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-fetch), [`-axios`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-axios), [`-angular`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-angular), [`-angular-resource`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-angular-resource)
+- Key formatting: `-key-bracket-notation`, `-key-rails`, `-key-flat`, `-key-custom-delimiter`, `-key-json`
+- Values: `-value-from-*` and `-value-to-*`
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Full matrix and recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
+
+---
+
+## 📄 License
+
+[MIT](./LICENSE) © Adam Pluciński

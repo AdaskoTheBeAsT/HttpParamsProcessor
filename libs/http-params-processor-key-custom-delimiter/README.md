@@ -1,109 +1,157 @@
-# Adaskothebeast
+# ✂️ @adaskothebeast/http-params-processor-key-custom-delimiter
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**Bring your own delimiter to [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): `user:name`, `user->name`, `api/users`, with brackets or the same delimiter for arrays.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-key-custom-delimiter?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-custom-delimiter)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+No runtime dependency beyond `core` (its only peer dependency, `^12.0.0`). ESM + CJS. `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-key-custom-delimiter @adaskothebeast/http-params-processor-core
 ```
 
-## Run tasks
+---
 
-To build the library use:
+## 🎯 What it does
 
-```sh
-npx nx build pkg1
+This is a **key formatting strategy**: it decides how nested keys are spelled while `ParamsProcessor` walks your object graph. Object properties are joined with a delimiter **you** choose (default `':'`), while array elements keep bracket indices unless you ask for the delimiter there too. It exists for bespoke or legacy APIs whose notation does not match dots, brackets, Rails or flat underscores.
+
+| Input                        | `DefaultKeyFormattingStrategy` (core) | This strategy (defaults)   |
+| ---------------------------- | ------------------------------------- | -------------------------- |
+| `{ user: { name: 'John' } }` | `p.user.name`                         | `p:user:name`              |
+| `{ items: ['a', 'b'] }`      | `p.items[0]`, `p.items[1]`            | `p:items[0]`, `p:items[1]` |
+| `{ arr: [{ id: '1' }] }`     | `p.arr[0].id`                         | `p:arr[0]:id`              |
+
+---
+
+## 🧰 API
+
+### `CustomDelimiterKeyFormattingStrategy`
+
+Implements `IKeyFormattingStrategy` from `core`.
+
+| Member                                                                     | Returns  | Result                                                                           |
+| -------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `new CustomDelimiterKeyFormattingStrategy(objectDelimiter?, arrayFormat?)` | -        | Defaults: `':'` and `'bracket'`                                                  |
+| `formatObjectKey(parentKey, propertyKey)`                                  | `string` | `` `${parentKey}${objectDelimiter}${propertyKey}` ``                             |
+| `formatArrayKey(parentKey, index)`                                         | `string` | `` `${parentKey}[${index}]` `` or `` `${parentKey}${objectDelimiter}${index}` `` |
+
+Constructor parameters:
+
+| Parameter         | Type                       | Default     | Meaning                                                     |
+| ----------------- | -------------------------- | ----------- | ----------------------------------------------------------- |
+| `objectDelimiter` | `string`                   | `':'`       | Inserted between a parent key and a property name           |
+| `arrayFormat`     | `'bracket' \| 'delimiter'` | `'bracket'` | `'bracket'` keeps `items[0]`, `'delimiter'` emits `items:0` |
+
+`transformComplexObject` is not implemented, so nested objects and arrays are always traversed down to primitives.
+
+---
+
+## ⚡ Usage
+
+```ts
+import { ParamsProcessor } from '@adaskothebeast/http-params-processor-core';
+import { CustomDelimiterKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-key-custom-delimiter';
+
+const processor = new ParamsProcessor({
+  keyFormatter: new CustomDelimiterKeyFormattingStrategy(),
+});
+
+processor.process('p', {
+  user: { name: 'John', profile: { email: 'john@example.com' } },
+  items: ['a', 'b'],
+});
+// [
+//   ['p:user:name', 'John'],
+//   ['p:user:profile:email', 'john@example.com'],
+//   ['p:items[0]', 'a'],
+//   ['p:items[1]', 'b'],
+// ]
 ```
 
-To run any task with Nx use:
+The same `keyFormatter` option is accepted by every adapter (`-angular`, `-angular-resource`, `-fetch`, `-axios`, `-react-tanstack-query`, `-react-swr`), because they all forward their options object to `ParamsProcessor`.
 
-```sh
-npx nx <target> <project-name>
+---
+
+## 🎛️ Options and configuration
+
+```ts
+new CustomDelimiterKeyFormattingStrategy(); // ':' + brackets
+new CustomDelimiterKeyFormattingStrategy('->'); // user->name, items[0]
+new CustomDelimiterKeyFormattingStrategy('/'); // api/users, api/users[0]
+new CustomDelimiterKeyFormattingStrategy(':', 'delimiter'); // user:name, items:2
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+| Constructor arguments | `user` + `name` | `items` + `2`  |
+| --------------------- | --------------- | -------------- |
+| _(none)_              | `user:name`     | `items[2]`     |
+| `'->'`                | `user->name`    | `items[2]`     |
+| `'/'`                 | `api/users`     | `api/users[2]` |
+| `':', 'delimiter'`    | `user:name`     | `items:2`      |
+| `'.', 'delimiter'`    | `user.name`     | `items.2`      |
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+`'delimiter'` mode reuses `objectDelimiter` for indices, so array elements and object properties become indistinguishable in the key - pick it only when your backend does not need to tell them apart (or when it splits on the delimiter and infers arrays from numeric segments).
 
-## Versioning and releasing
+The strategy is stateless, so a single instance can be shared, and `keyFormatter` can also be passed per call to override the processor default.
 
-To version and release the library use
+---
 
-```
-npx nx release
-```
+## 📤 Output examples
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+```ts
+const processor = new ParamsProcessor({
+  keyFormatter: new CustomDelimiterKeyFormattingStrategy(':', 'delimiter'),
+});
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+processor.process('p', { arr: [{ id: '1', innerArr: [{ id: '1.1' }] }] });
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
+```text
+p:arr:0:id                = 1
+p:arr:0:innerArr:0:id     = 1.1
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+```ts
+const arrow = new ParamsProcessor({
+  keyFormatter: new CustomDelimiterKeyFormattingStrategy('->'),
+});
 
-## Set up CI!
+arrow.process('p', { user: { name: 'John' }, items: ['a'] });
+// [['p->user->name', 'John'], ['p->items[0]', 'a']]
 
-### Step 1
-
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
+arrow.toQueryString('p', { user: { name: 'John' } });
+// p-%3Euser-%3Ename=John
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+---
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## ⚠️ Edge cases
 
-### Step 2
+- **Delimiters are percent encoded** by `toQueryString` and `toURLSearchParams`: `':'` becomes `%3A`, `'/'` becomes `%2F`, `'->'` becomes `-%3E`. `process` returns raw keys, so if the backend must literally see `:` or `/`, build the URL yourself from `process` output (both characters are legal unencoded in a query component).
+- The delimiter is inserted verbatim, with no escaping. If a property name contains the delimiter, the key becomes ambiguous - the same collision risk as [`-key-flat`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-flat).
+- An **empty root key** produces a leading delimiter (`process('', { user: 1 })` gives `:user`). Pass a real root name.
+- In `'bracket'` mode array keys are always `[index]`, independent of `objectDelimiter`; there is no way to get empty brackets (`items[]`) - use [`-key-rails`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-rails) for that.
+- `arrayFormat` accepts only `'bracket'` and `'delimiter'`; any other value is rejected by TypeScript, and at runtime anything other than `'bracket'` behaves as `'delimiter'`.
+- Numeric object property keys are formatted like properties, not indices: with defaults, `formatObjectKey('data', '0')` gives `data:0` while `formatArrayKey('data', 0)` gives `data[0]`.
+- `null`/`undefined` values, `$type` discriminators, empty objects and empty arrays are dropped by `core` before this strategy is consulted; circular references throw `Error: Circular reference detected at key: <key>`.
 
-Use the following command to configure a CI workflow for your workspace:
+---
 
-```sh
-npx nx g ci-workflow
-```
+## 🔗 Related packages
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- Fixed notations: [`-key-bracket-notation`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-bracket-notation) (`user[name]`), [`-key-rails`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-rails) (`items[]`), [`-key-flat`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-flat) (`user_name`, one separator everywhere)
+- Single parameter: [`-key-json`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-key-json)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core) (implement `IKeyFormattingStrategy` yourself if even this is not flexible enough)
 
-## Install Nx Console
+Full matrix and adapter recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+---
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📄 License
 
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+[MIT](./LICENSE) © Adam Pluciński

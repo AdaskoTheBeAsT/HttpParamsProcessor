@@ -19,3 +19,5 @@ export * from './lib/strategies/defaults/default-primitive-value-to-strategy';
 // Intermediate types
 export * from './lib/strategies/models/duration-components';
 export * from './lib/strategies/models/period-components';
+export * from './lib/strategies/models/decimal-components';
+export * from './lib/strategies/models/uuid-components';

@@ -206,7 +206,7 @@ export class FetchParamsProcessor {
  *
  * @example
  * ```typescript
- * import { createFetchParamsProcessor } from '@adaskothebeast/params-processor-fetch';
+ * import { createFetchParamsProcessor } from '@adaskothebeast/http-params-processor-fetch';
  *
  * const processor = createFetchParamsProcessor();
  *
@@ -229,7 +229,7 @@ export function createFetchParamsProcessor(
  *
  * @example
  * ```typescript
- * import { buildFetchUrl } from '@adaskothebeast/params-processor-fetch';
+ * import { buildFetchUrl } from '@adaskothebeast/http-params-processor-fetch';
  *
  * const url = buildFetchUrl('/api/products', 'filter', {
  *   category: 'electronics',
@@ -254,7 +254,7 @@ export function buildFetchUrl(
  *
  * @example
  * ```typescript
- * import { toFetchParams } from '@adaskothebeast/params-processor-fetch';
+ * import { toFetchParams } from '@adaskothebeast/http-params-processor-fetch';
  *
  * const params = toFetchParams('filter', { status: 'active' });
  *

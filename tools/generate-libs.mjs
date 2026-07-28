@@ -10,14 +10,18 @@ const libs = [
   'http-params-processor-react-swr',
   'http-params-processor-react-tanstack-query',
   'http-params-processor-value-from-dayjs',
+  'http-params-processor-value-from-decimal',
   'http-params-processor-value-from-js-joda',
   'http-params-processor-value-from-luxon',
   'http-params-processor-value-from-moment',
+  'http-params-processor-value-from-uuid',
   'http-params-processor-value-to-date-fns',
+  'http-params-processor-value-to-decimal',
   'http-params-processor-value-to-iso',
   'http-params-processor-value-to-ms-timestamp',
   'http-params-processor-value-to-nodatime',
   'http-params-processor-value-to-unix-timestamp',
+  'http-params-processor-value-to-uuid',
 ];
 
 const baseDir = 'libs';
@@ -75,7 +79,7 @@ function createPackageJson(libName) {
     },
     "files": ["dist", "!**/*.tsbuildinfo"],
     "peerDependencies": {
-      "@adaskothebeast/http-params-processor-core": "^0.0.1"
+      "@adaskothebeast/http-params-processor-core": "^12.0.0"
     }
   }, null, 2);
 }

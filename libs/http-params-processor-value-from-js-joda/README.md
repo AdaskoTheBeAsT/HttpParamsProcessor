@@ -1,109 +1,133 @@
-# Adaskothebeast
+# 🗓️ @adaskothebeast/http-params-processor-value-from-js-joda
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**js-joda input strategies for [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): normalize `LocalDate`, `LocalDateTime`, `ZonedDateTime`, `Duration` and `Period` values before they are serialized.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-value-from-js-joda?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-js-joda)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+Peer dependencies: `core` and `@js-joda/core` (`^6.1.0`). ESM + CJS. `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-value-from-js-joda @adaskothebeast/http-params-processor-core @js-joda/core
 ```
 
-## Run tasks
+Add the time zone database as well if you pass `ZonedDateTime` values built from IANA zone ids - `@js-joda/core` alone only knows UTC, fixed offsets and the system zone:
 
-To build the library use:
-
-```sh
-npx nx build pkg1
+```bash
+npm i @js-joda/timezone
 ```
 
-To run any task with Nx use:
+---
 
-```sh
-npx nx <target> <project-name>
+## 🎯 What it does
+
+These are **value-from** strategies: the first half of the conversion pipeline. Each one normalizes a js-joda type into a neutral shape and must be paired with a **value-to** strategy (`-value-to-iso`, `-value-to-nodatime`, `-value-to-unix-timestamp`, `-value-to-ms-timestamp`, `-value-to-date-fns`) through `createValueConverter`.
+
+| Class                              | Accepts                                                      | Produces                                                                |
+| ---------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `JsJodaLocalDateValueFromStrategy` | `LocalDate`, `LocalDateTime`, `ZonedDateTime` (`instanceof`) | `Date` (`convert(value).toDate()`)                                      |
+| `JsJodaDurationValueFromStrategy`  | `Duration` (`instanceof`)                                    | `DurationComponents` with `hours`, `minutes`, `seconds`, `milliseconds` |
+| `JsJodaPeriodValueFromStrategy`    | `Period` (`instanceof`)                                      | `PeriodComponents` with `years`, `months`, `days`                       |
+
+js-joda is the only supported input library that separates a **`Duration`** (exact time, always rendered as hours and below) from a **`Period`** (calendar amount, always rendered as years, months and days), which maps one-to-one onto the two neutral shapes in `core`.
+
+---
+
+## ⚡ Usage
+
+```ts
+import { ParamsProcessor, createValueConverter } from '@adaskothebeast/http-params-processor-core';
+import { JsJodaDurationValueFromStrategy, JsJodaLocalDateValueFromStrategy, JsJodaPeriodValueFromStrategy } from '@adaskothebeast/http-params-processor-value-from-js-joda';
+import { IsoDateValueToStrategy, IsoDurationValueToStrategy, IsoPeriodValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-iso';
+import { Duration, LocalDateTime, Period } from '@js-joda/core';
+
+const processor = new ParamsProcessor({
+  valueConverters: [createValueConverter(new JsJodaLocalDateValueFromStrategy(), new IsoDateValueToStrategy()), createValueConverter(new JsJodaPeriodValueFromStrategy(), new IsoPeriodValueToStrategy()), createValueConverter(new JsJodaDurationValueFromStrategy(), new IsoDurationValueToStrategy())],
+});
+
+processor.process('p', {
+  from: LocalDateTime.of(2024, 1, 15, 10, 30, 45),
+  window: Duration.ofHours(2).plusMinutes(30),
+  term: Period.of(1, 2, 3),
+});
+// p.from is the instant of 2024-01-15T10:30:45 in the system zone
+// p.window = 'PT2H30M', p.term = 'P1Y2M3D'
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+---
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 🎛️ Options and configuration
 
-## Versioning and releasing
+No strategy takes constructor options - all three are stateless and safe to share between processors.
 
-To version and release the library use
+**Local types are resolved in the system zone.** `convert(value).toDate()` is called without an explicit zone, so a `LocalDate` becomes local midnight and a `LocalDateTime` becomes that local wall-clock time. With the ISO writer (which always emits UTC) `LocalDate.of(2024, 1, 15)` in `Europe/Warsaw` serializes as `2024-01-14T23:00:00.000Z`. If you need the calendar date to survive verbatim, either send `localDate.toString()` as a plain string or convert to a `ZonedDateTime` in UTC yourself:
 
-```
-npx nx release
-```
+```ts
+import { LocalDate, ZoneOffset } from '@js-joda/core';
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+LocalDate.of(2024, 1, 15).atStartOfDay(ZoneOffset.UTC);
+// -> 2024-01-15T00:00:00.000Z
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+**`ZonedDateTime` keeps the instant**, so the zone or offset it was built with is applied correctly and then dropped.
 
-```sh
-npx nx sync:check
+**Register the period converter before the duration converter** if both are in play. They cannot collide on js-joda values (`instanceof` checks are exact), but the ISO writers detect the neutral shapes structurally, so keeping the period pair first matches the ordering recommended by [`-value-to-iso`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-iso).
+
+---
+
+## 📤 Output examples
+
+Paired with `-value-to-iso`:
+
+| Value passed to `process`                     | Normalized shape                   | Serialized                                      |
+| --------------------------------------------- | ---------------------------------- | ----------------------------------------------- |
+| `LocalDate.of(2024, 1, 15)`                   | `Date` (local midnight)            | `2024-01-14T23:00:00.000Z` (in `Europe/Warsaw`) |
+| `LocalDateTime.of(2024, 1, 15, 10, 30, 45)`   | `Date` (local wall clock)          | `2024-01-15T09:30:45.000Z` (in `Europe/Warsaw`) |
+| `ZonedDateTime.parse('2024-01-15T10:30:00Z')` | `Date` (instant)                   | `2024-01-15T10:30:00.000Z`                      |
+| `Duration.ofHours(2).plusMinutes(30)`         | `{ hours: 2, minutes: 30 }`        | `PT2H30M`                                       |
+| `Duration.ofMinutes(90)`                      | `{ hours: 1, minutes: 30 }`        | `PT1H30M`                                       |
+| `Duration.ofDays(2)`                          | `{ hours: 48 }`                    | `PT48H`                                         |
+| `Duration.ZERO`                               | `{}`                               | `PT0S`                                          |
+| `Period.of(1, 2, 3)`                          | `{ years: 1, months: 2, days: 3 }` | `P1Y2M3D`                                       |
+| `Period.ofMonths(20)`                         | `{ months: 20 }`                   | `P20M`                                          |
+| `Period.ofWeeks(3)`                           | `{ days: 21 }`                     | `P21D`                                          |
+| `Period.ZERO`                                 | `{}`                               | `P0D`                                           |
+
+```text
+p.window  = PT2H30M
+p.term    = P1Y2M3D
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+---
 
-## Set up CI!
+## ⚠️ Edge cases
 
-### Step 1
+- **Durations never carry days or larger.** The strategy reads the total seconds and splits them into hours, minutes and seconds, so `Duration.ofDays(2)` becomes `PT48H`, not `P2D`. That is faithful to js-joda semantics (a `Duration` is exact time), but backends expecting `P2D` need a `Period` instead.
+- **Sub-millisecond precision is lost.** Nanoseconds are truncated towards zero (`Math.floor(nano / 1_000_000)`), so `Duration.ofNanos(1_500_000)` normalizes to `{ milliseconds: 1 }` and anything below 1 ms disappears.
+- **Negative durations are not supported.** The component split assumes a non-negative amount, so `Duration.ofMinutes(-90)` normalizes to `{ hours: -2, minutes: -30 }`, which serializes as `PT-2H-30M` instead of a 90 minute deficit. Send `duration.abs()` and pass the sign as a separate parameter.
+- **Periods are never normalized.** `Period.ofMonths(20)` stays `P20M` (js-joda only carries months into years when you call `normalized()`), and weeks are folded into days at construction time, so a `weeks` field is never emitted.
+- Zero components are converted to `undefined`; `Duration.ZERO` yields `PT0S` and `Period.ZERO` yields `P0D`.
+- **No invalid-value trap.** js-joda throws while constructing an out-of-range value, so unlike Moment, Day.js or Luxon there is no "invalid" object that can slip through `canHandle` and produce `Invalid Date`.
+- `Instant`, `OffsetDateTime`, `LocalTime`, `YearMonth` and `MonthDay` are **not** handled. Wrap them first (for example `instant.atZone(ZoneOffset.UTC)`) or send `value.toString()` as a plain string.
+- Detection is `instanceof`, so values crossing a realm boundary (iframe, worker, or two copies of `@js-joda/core` in the dependency tree) are not recognized. Keep a single hoisted `@js-joda/core` version.
+- A `Duration` or `Period` is not an instant; never pair those strategies with a date writer such as `IsoDateValueToStrategy` - the converter always runs the paired writer, it does not re-check the shape.
 
-To connect to Nx Cloud, run the following command:
+---
 
-```sh
-npx nx connect
-```
+## 🔗 Related packages
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+- Outputs: [`-value-to-iso`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-iso), [`-value-to-nodatime`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-nodatime), [`-value-to-unix-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-unix-timestamp), [`-value-to-ms-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-ms-timestamp), [`-value-to-date-fns`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-date-fns)
+- Other inputs: [`-value-from-luxon`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-luxon), [`-value-from-dayjs`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-dayjs), [`-value-from-moment`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-moment)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Full matrix and adapter recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
 
-### Step 2
+---
 
-Use the following command to configure a CI workflow for your workspace:
+## 📄 License
 
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+[MIT](./LICENSE) © Adam Pluciński

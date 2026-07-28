@@ -1,109 +1,126 @@
-# Adaskothebeast
+# ⏱️ @adaskothebeast/http-params-processor-value-from-moment
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**Moment.js input strategies for [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): normalize `Moment` instants and `moment.Duration` objects before they are serialized.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-value-from-moment?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-moment)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+Peer dependencies: `core` and `moment` (`^2.30.1`). ESM + CJS. `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-value-from-moment @adaskothebeast/http-params-processor-core moment
 ```
 
-## Run tasks
+`moment-timezone` is only needed if **your** code builds moments in named IANA zones (`moment.tz(...)`); the strategies themselves never touch zone data.
 
-To build the library use:
+---
 
-```sh
-npx nx build pkg1
+## 🎯 What it does
+
+These are **value-from** strategies: the first half of the conversion pipeline. Each one normalizes a Moment type into a neutral shape and must be paired with a **value-to** strategy (`-value-to-iso`, `-value-to-nodatime`, `-value-to-unix-timestamp`, `-value-to-ms-timestamp`, `-value-to-date-fns`) through `createValueConverter`.
+
+| Class                             | Accepts                                             | Produces                                                                                        |
+| --------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `MomentDateValueFromStrategy`     | `Moment` (detected by `moment.isMoment`)            | `Date` (`value.toDate()`)                                                                       |
+| `MomentDurationValueFromStrategy` | `moment.Duration` (detected by `moment.isDuration`) | `DurationComponents` (`years`, `months`, `days`, `hours`, `minutes`, `seconds`, `milliseconds`) |
+
+Detection is exact and mutually exclusive: a `Moment` is never claimed by the duration strategy and vice versa, so both converters can be registered side by side.
+
+---
+
+## ⚡ Usage
+
+```ts
+import { DefaultDateValueFromStrategy, ParamsProcessor, createValueConverter } from '@adaskothebeast/http-params-processor-core';
+import { MomentDateValueFromStrategy, MomentDurationValueFromStrategy } from '@adaskothebeast/http-params-processor-value-from-moment';
+import { IsoDateValueToStrategy, IsoDurationValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-iso';
+import moment from 'moment';
+
+const processor = new ParamsProcessor({
+  valueConverters: [
+    createValueConverter(new MomentDateValueFromStrategy(), new IsoDateValueToStrategy()),
+    createValueConverter(new MomentDurationValueFromStrategy(), new IsoDurationValueToStrategy()),
+    // keep native Dates working too
+    createValueConverter(new DefaultDateValueFromStrategy(), new IsoDateValueToStrategy()),
+  ],
+});
+
+processor.process('p', {
+  from: moment.utc('2024-01-15T10:30:00.000Z'),
+  window: moment.duration({ hours: 1, minutes: 30, seconds: 45 }),
+});
+// [['p.from', '2024-01-15T10:30:00.000Z'], ['p.window', 'PT1H30M45S']]
 ```
 
-To run any task with Nx use:
+---
 
-```sh
-npx nx <target> <project-name>
+## 🎛️ Options and configuration
+
+Neither strategy takes constructor options - both are stateless and safe to share between processors.
+
+**Zones and UTC mode collapse into an instant.** `toDate()` returns a native `Date`, so `moment.utc(...)`, `moment.parseZone(...)` and `moment.tz(..., 'Asia/Tokyo')` all serialize to the same moment in time; the offset itself is not carried. The paired writer decides the rendering (`-value-to-iso` always emits UTC with `Z`).
+
+**Moment normalizes durations for you.** Unlike Luxon and Day.js, `moment.duration` carries units on construction, so what you get out can differ from what you put in - see the table below.
+
+**Output format** is decided by the paired value-to strategy:
+
+```ts
+import { MsTimestampValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-ms-timestamp';
+
+createValueConverter(new MomentDateValueFromStrategy(), new MsTimestampValueToStrategy());
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+---
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📤 Output examples
 
-## Versioning and releasing
+Paired with `-value-to-iso`:
 
-To version and release the library use
+| Value passed to `process`                            | Normalized shape                         | Serialized                 |
+| ---------------------------------------------------- | ---------------------------------------- | -------------------------- |
+| `moment.utc('2024-01-15T10:30:00.000Z')`             | `Date` (instant)                         | `2024-01-15T10:30:00.000Z` |
+| `moment.duration({ hours: 1, minutes: 30 })`         | `{ hours: 1, minutes: 30 }`              | `PT1H30M`                  |
+| `moment.duration({ minutes: 90 })`                   | `{ hours: 1, minutes: 30 }`              | `PT1H30M`                  |
+| `moment.duration({ months: 18 })`                    | `{ years: 1, months: 6 }`                | `P1Y6M`                    |
+| `moment.duration({ days: 45 })`                      | `{ months: 1, days: 14 }`                | `P1M14D`                   |
+| `moment.duration({ weeks: 2 })`                      | `{ days: 14 }`                           | `P14D`                     |
+| `moment.duration({ seconds: 1, milliseconds: 500 })` | `{ seconds: 1, milliseconds: 500 }`      | `PT1.5S`                   |
+| `moment.duration('PT1H30M45S')`                      | `{ hours: 1, minutes: 30, seconds: 45 }` | `PT1H30M45S`               |
 
-```
-npx nx release
-```
-
-Pass `--dry-run` to see what would happen without actually releasing the library.
-
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
+```text
+p.from    = 2024-01-15T10:30:00.000Z
+p.window  = PT1H30M45S
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+---
 
-```sh
-npx nx sync:check
-```
+## ⚠️ Edge cases
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+- **Moment carries units, so values change shape.** `{ minutes: 90 }` comes back as 1 hour 30 minutes, `{ months: 18 }` as 1 year 6 months, and large day counts roll into months (`{ days: 45 }` becomes 1 month 14 days, using Moment's approximate 30.4-day month). Send `asDays()`/`asSeconds()` numbers instead if the backend needs the exact unit you authored.
+- **Weeks are folded into days.** Moment reports `moment.duration({ weeks: 2 }).days()` as `14`, and the strategy does not map a `weeks` field at all, so you get `P14D`, never `P2W`.
+- Zero components are converted to `undefined`, so `{ hours: 1 }` never emits `0` days or minutes, and `moment.duration(0)` normalizes to an empty object (`PT0S` with the ISO writer).
+- **Invalid moments still pass `canHandle`.** `moment('nope')` and `moment.invalid()` are `Moment` objects, so they are claimed and normalized to `Invalid Date`; `IsoDateValueToStrategy` then throws `RangeError: Invalid time value` (timestamp writers emit `NaN`). Guard with `.isValid()` before building your params object.
+- Fractional seconds are carried into the millisecond field (`{ seconds: 1.5 }` becomes `{ seconds: 1, milliseconds: 500 }`), which the ISO writer renders as `PT1.5S`.
+- Negative durations keep their sign per component, which produces non-standard output such as `PT-1H` - normalize with `.abs()` and send the sign separately if that matters.
+- `moment.Duration` values are not instants; never pair `MomentDurationValueFromStrategy` with a date writer such as `IsoDateValueToStrategy` - the converter always runs the paired writer, it does not re-check the shape.
+- Moment is in maintenance mode upstream; for new code prefer [`-value-from-luxon`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-luxon) or [`-value-from-dayjs`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-dayjs). Both can be registered next to this package during a gradual migration.
 
-## Set up CI!
+---
 
-### Step 1
+## 🔗 Related packages
 
-To connect to Nx Cloud, run the following command:
+- Outputs: [`-value-to-iso`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-iso), [`-value-to-nodatime`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-nodatime), [`-value-to-unix-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-unix-timestamp), [`-value-to-ms-timestamp`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-ms-timestamp), [`-value-to-date-fns`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-to-date-fns)
+- Other inputs: [`-value-from-luxon`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-luxon), [`-value-from-dayjs`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-dayjs), [`-value-from-js-joda`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-value-from-js-joda)
+- Engine: [`-core`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
 
-```sh
-npx nx connect
-```
+Full matrix and adapter recipes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+---
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📄 License
 
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+[MIT](./LICENSE) © Adam Pluciński

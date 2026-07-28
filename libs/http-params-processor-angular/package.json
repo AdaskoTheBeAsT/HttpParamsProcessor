@@ -1,6 +1,21 @@
 {
   "name": "@adaskothebeast/http-params-processor-angular",
-  "version": "11.1.0",
+  "version": "12.0.0",
+  "description": "Angular HttpParams builder for deeply nested objects and arrays, with DI configurable key formatting and value conversion strategies.",
+  "keywords": [
+    "http",
+    "http-params",
+    "query-string",
+    "query-params",
+    "querystring",
+    "nested-objects",
+    "serializer",
+    "typescript",
+    "angular",
+    "httpparams",
+    "httpclient",
+    "ng"
+  ],
   "license": "MIT",
   "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
   "repository": {
@@ -12,9 +27,9 @@
   },
   "homepage": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
   "peerDependencies": {
-    "@adaskothebeast/http-params-processor-core": "^11.1.0",
-    "@angular/common": ">=21.0.0",
-    "@angular/core": ">=21.0.0"
+    "@adaskothebeast/http-params-processor-core": "^12.0.0",
+    "@angular/common": ">=22.0.8",
+    "@angular/core": ">=22.0.8"
   },
   "sideEffects": false
 }

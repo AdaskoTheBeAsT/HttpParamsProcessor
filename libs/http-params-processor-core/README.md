@@ -1,109 +1,186 @@
-# Adaskothebeast
+# 🧩 @adaskothebeast/http-params-processor-core
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+**The framework-agnostic engine of [HttpParamsProcessor](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor): turns deeply nested objects into flat query parameter pairs.**
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+[![npm](https://img.shields.io/npm/v/%40adaskothebeast%2Fhttp-params-processor-core?color=cb3837&logo=npm)](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-core)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+Zero runtime dependencies. ESM + CJS. `sideEffects: false`.
 
-## Generate a library
+---
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+## 📦 Install
+
+```bash
+npm i @adaskothebeast/http-params-processor-core
 ```
 
-## Run tasks
+`core` is a **peer dependency of every other package** in the family - adapters (`-angular`, `-fetch`, `-axios`, `-react-*`), key formatting strategies (`-key-*`) and value strategies (`-value-*`) all need it installed alongside them.
 
-To build the library use:
+---
 
-```sh
-npx nx build pkg1
+## 🎯 What it does
+
+`ParamsProcessor` walks an object graph recursively and emits `[key, value]` string pairs:
+
+```ts
+import { ParamsProcessor } from '@adaskothebeast/http-params-processor-core';
+
+const processor = new ParamsProcessor();
+
+processor.process('p', {
+  arr: [{ id: '1', innerArr: [{ id: '1.1', text: 'first' }] }],
+});
 ```
 
-To run any task with Nx use:
-
-```sh
-npx nx <target> <project-name>
+```text
+p.arr[0].id                = 1
+p.arr[0].innerArr[0].id    = 1.1
+p.arr[0].innerArr[0].text  = first
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Two things are pluggable:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- **key formatting** - how nested keys are spelled (`user.name`, `user[name]`, `user_name`, …)
+- **value conversion** - a two-stage `from → to` pipeline that normalizes a library type into a neutral shape and then renders it as a string
 
-## Versioning and releasing
+---
 
-To version and release the library use
+## 🧰 API
 
-```
-npx nx release
-```
+### `ParamsProcessor`
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+| Member                                  | Returns                              | Notes                                                           |
+| --------------------------------------- | ------------------------------------ | --------------------------------------------------------------- |
+| `new ParamsProcessor(options?)`         | -                                    | `options` sets the instance-wide defaults                       |
+| `createParamsProcessor(options?)`       | `ParamsProcessor`                    | Factory helper, identical to the constructor                    |
+| `process(key, obj, options?)`           | `ParamsEntry[]` (`[key, value][]`)   | The primitive every adapter builds on; preserves duplicate keys |
+| `toQueryString(key, obj, options?)`     | `string`                             | `encodeURIComponent`-encoded, **no** leading `?`                |
+| `toURLSearchParams(key, obj, options?)` | `URLSearchParams`                    | Uses `append`, so array entries survive                         |
+| `toPlainObject(key, obj, options?)`     | `Record<string, string \| string[]>` | Duplicate keys collapse into arrays - handy for `axios.params`  |
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+`options` (`ParamsProcessorOptions`) can be passed per call and overrides the instance defaults:
 
-## Keep TypeScript project references up to date
-
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
-
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
-```
-
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
+```ts
+interface ParamsProcessorOptions {
+  keyFormatter?: IKeyFormattingStrategy;
+  valueConverters?: IValueConverter[];
+}
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+### Types
 
-## Set up CI!
+`ParamsEntry`, `Primitive`, `ProcessableInput`, `isPlainObjectOrArray`.
 
-### Step 1
+### Key formatting
 
-To connect to Nx Cloud, run the following command:
+| Export                         | Purpose                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `IKeyFormattingStrategy`       | `formatObjectKey`, `formatArrayKey`, optional `transformComplexObject`   |
+| `IParamsAppender`              | Minimal `append(key, value)` sink used by `transformComplexObject`       |
+| `DefaultKeyFormattingStrategy` | Dot notation for objects (`user.name`), brackets for arrays (`items[0]`) |
 
-```sh
-npx nx connect
+### Value conversion pipeline
+
+| Export                                                      | Purpose                                                       |
+| ----------------------------------------------------------- | ------------------------------------------------------------- |
+| `IValueFromStrategy<TFrom, TTo>`                            | `normalizeValue` + `canHandle` - library type → neutral shape |
+| `IValueToStrategy<TFrom>`                                   | `serializeValue` + `canHandle` - neutral shape → `string`     |
+| `IValueConverter`, `ValueConverter`, `createValueConverter` | Pairs one `from` with one `to`                                |
+| `DefaultDateValueFromStrategy`                              | `Date` → `Date` (pass-through)                                |
+| `DefaultDateValueToStrategy`                                | `Date` → `toISOString()`                                      |
+| `DefaultPrimitiveValueToStrategy`                           | `string \| number \| boolean` → `String(value)`               |
+
+### Intermediate models
+
+| Export                                                    | Shape                                                                           |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `DurationComponents`                                      | `{ years?, months?, weeks?, days?, hours?, minutes?, seconds?, milliseconds? }` |
+| `PeriodComponents`                                        | `{ years?, months?, weeks?, days? }` (calendar-based, not convertible to ms)    |
+| `DecimalComponents` + `isDecimalComponents`               | `{ decimal: string }` - lossless, non-exponential literal                       |
+| `UuidComponents` + `isUuidComponents`, `UUID_BYTE_LENGTH` | `{ bytes: Uint8Array }` - 16 bytes, RFC 4122 order                              |
+
+---
+
+## 🎛️ Configuration
+
+```ts
+import { ParamsProcessor, createValueConverter } from '@adaskothebeast/http-params-processor-core';
+import { BracketNotationKeyFormattingStrategy } from '@adaskothebeast/http-params-processor-key-bracket-notation';
+import { LuxonDateTimeValueFromStrategy } from '@adaskothebeast/http-params-processor-value-from-luxon';
+import { UnixTimestampValueToStrategy } from '@adaskothebeast/http-params-processor-value-to-unix-timestamp';
+
+const processor = new ParamsProcessor({
+  keyFormatter: new BracketNotationKeyFormattingStrategy(),
+  valueConverters: [createValueConverter(new LuxonDateTimeValueFromStrategy(), new UnixTimestampValueToStrategy())],
+});
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+Converters are tried **in order**, first `canHandle` wins - put the specific ones first.
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+> ⚠️ Passing `valueConverters` **replaces** the defaults. If you still want plain `Date`s and primitives handled, append `createValueConverter(new DefaultDateValueFromStrategy(), new DefaultDateValueToStrategy())` and a primitive converter yourself - otherwise unmatched values fall back to `String(value)`.
 
-### Step 2
+### Writing your own strategy
 
-Use the following command to configure a CI workflow for your workspace:
+```ts
+import { IValueFromStrategy, IValueToStrategy } from '@adaskothebeast/http-params-processor-core';
 
-```sh
-npx nx g ci-workflow
+class BigIntValueFromStrategy implements IValueFromStrategy<bigint, string> {
+  normalizeValue(value: bigint): string {
+    return value.toString();
+  }
+  canHandle(value: unknown): value is bigint {
+    return typeof value === 'bigint';
+  }
+}
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Install Nx Console
+## 📤 Output examples
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+```ts
+const processor = new ParamsProcessor();
+const filter = { page: 2, tags: ['a', 'b'], from: new Date('2024-01-15T10:30:00Z') };
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+processor.toQueryString('p', filter);
+// p.page=2&p.tags%5B0%5D=a&p.tags%5B1%5D=b&p.from=2024-01-15T10%3A30%3A00.000Z
 
-## Useful links
+processor.toPlainObject('p', filter);
+// { 'p.page': '2', 'p.tags[0]': 'a', 'p.tags[1]': 'b', 'p.from': '2024-01-15T10:30:00.000Z' }
 
-Learn more:
+processor.process('', 'plain-value');
+// [['', 'plain-value']]
+```
 
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## 📐 Behaviour you can rely on
+
+- `null` and `undefined` properties are **skipped** entirely (no empty `key=`).
+- A `$type` property (typical .NET/JSON.NET discriminator) is ignored.
+- **Circular references throw** `Error: Circular reference detected at key: <key>` instead of hanging.
+- Non-plain objects (`Date`, `Decimal`, `Uint8Array`, class instances…) are offered to the value converters **before** traversal, so they are never walked property by property.
+- Plain objects and arrays are always traversed; only a `keyFormatter.transformComplexObject` that returns non-`null` (e.g. the JSON strategy) can short-circuit that.
+- Array order is preserved, and `process` never merges duplicate keys - only `toPlainObject` groups them.
+- Empty arrays and empty objects contribute no entries.
+- Values are encoded once by `toQueryString`/`toURLSearchParams`; `process` returns **raw** strings, so encode them yourself when building URLs manually.
+
+---
+
+## 🔗 Related packages
+
+Adapters: [`-angular`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-angular), [`-angular-resource`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-angular-resource), [`-fetch`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-fetch), [`-axios`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-axios), [`-react-tanstack-query`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-react-tanstack-query), [`-react-swr`](https://www.npmjs.com/package/@adaskothebeast/http-params-processor-react-swr).
+
+Key formatting: `-key-bracket-notation`, `-key-rails`, `-key-flat`, `-key-custom-delimiter`, `-key-json`.
+
+Values in: `-value-from-dayjs`, `-value-from-luxon`, `-value-from-moment`, `-value-from-js-joda`, `-value-from-decimal`, `-value-from-uuid`.
+Values out: `-value-to-iso`, `-value-to-nodatime`, `-value-to-unix-timestamp`, `-value-to-ms-timestamp`, `-value-to-date-fns`, `-value-to-decimal`, `-value-to-uuid`.
+
+Full matrix, adapter recipes and migration notes: [main README](https://github.com/AdaskoTheBeAsT/HttpParamsProcessor#readme).
+
+---
+
+## 📄 License
+
+[MIT](./LICENSE) © Adam Pluciński
