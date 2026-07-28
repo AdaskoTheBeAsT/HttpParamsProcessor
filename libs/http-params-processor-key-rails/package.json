@@ -20,7 +20,8 @@
   "author": "Adam Pluciński <adaskothebeast@gmail.com> (https://github.com/adaskothebeast)",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AdaskoTheBeAsT/HttpParamsProcessor.git"
+    "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor",
+    "directory": "libs/http-params-processor-key-rails"
   },
   "bugs": {
     "url": "https://github.com/AdaskoTheBeAsT/HttpParamsProcessor/issues"
